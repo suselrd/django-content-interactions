@@ -1,6 +1,6 @@
 # coding=utf-8
 from django import template
-from ..mixins import LikableMixin, FavoriteListItemMixin, RateableMixin
+from ..mixins import LikableMixin, FavoriteListItemMixin, RateableMixin, DenounceTargetMixin
 from ..utils import intmin as intmin_function
 
 register = template.Library()
@@ -47,6 +47,19 @@ def rating_of(obj, user):
         raise Exception("RateableMixin instance expected")
     return obj.rating(user)
 
+
+@register.filter
+def denounced_by(obj, user):
+    """
+    Returns whether an obj is denounced by the passed user or not.
+    """
+    if user.is_anonymous():
+        return False
+    if not obj:
+        return False
+    if not isinstance(obj, DenounceTargetMixin):
+        raise Exception("DenounceTargetMixin instance expected")
+    return obj.denounced_by(user)
 
 
 @register.filter(is_safe=False)

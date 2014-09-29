@@ -13,7 +13,11 @@ from . import (
     FAVORITE,
     FAVORITE_STR,
     FAVORITE_OF,
-    FAVORITE_OF_STR
+    FAVORITE_OF_STR,
+    DENOUNCE,
+    DENOUNCE_STR,
+    DENOUNCED_BY,
+    DENOUNCED_BY_STR
 )
 
 
@@ -44,6 +48,15 @@ def create_edge_types(**kwargs):
         'read_as': FAVORITE_OF_STR
     })
     EdgeTypeAssociation.objects.get_or_create(direct=favorite, inverse=favorite_of)
+
+    # Denounce edges
+    denounce, created = EdgeType.objects.get_or_create(name=DENOUNCE, defaults={
+        'read_as': DENOUNCE_STR
+    })
+    denounced_by, created = EdgeType.objects.get_or_create(name=DENOUNCED_BY, defaults={
+        'read_as': DENOUNCED_BY_STR
+    })
+    EdgeTypeAssociation.objects.get_or_create(direct=denounce, inverse=denounced_by)
 
 
 post_syncdb.connect(create_edge_types, sender=social_graph_app)
