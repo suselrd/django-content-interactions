@@ -33,4 +33,10 @@ urlpatterns = patterns('',
         login_required(RateView.as_view()),
         name="rate_item"
     ),
+
+    url(
+        r'^denounce/$',
+        login_required(RateView.as_view()),
+        name="denounce_item"
+    ),
 )

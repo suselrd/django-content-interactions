@@ -9,7 +9,7 @@ from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View, FormView
-from .forms import ShareForm, RecommendForm, RateForm
+from .forms import ShareForm, RecommendForm, RateForm, DenounceForm
 from .signals import item_shared, item_recommended
 from .utils import intmin
 
@@ -19,6 +19,7 @@ MODAL_VALIDATION_ERROR_MESSAGE = _(u"A validation error has occurred.")
 MODAL_SHARE_SUCCESS_MESSAGE = _(u"The item has been successfully shared.")
 MODAL_RECOMMEND_SUCCESS_MESSAGE = _(u"The item has been successfully recommended.")
 MODAL_RATE_SUCCESS_MESSAGE = _(u"The item has been successfully rated.")
+MODAL_DENOUNCE_SUCCESS_MESSAGE = _(u"The operation has been successfully done.")
 
 
 class JSONResponseMixin(object):
@@ -197,6 +198,37 @@ class RateView(FormView):
         form.save_rating()
         context = {
             'successMsg': force_text(MODAL_RATE_SUCCESS_MESSAGE),
+        }
+        return HttpResponse(json.dumps(context), content_type='application/json')
+
+    def form_invalid(self, form):
+        context = {
+            'errorMsg': force_text(MODAL_VALIDATION_ERROR_MESSAGE)
+        }
+        return HttpResponseBadRequest(json.dumps(context), content_type='application/json')
+
+
+class DenounceView(FormView):
+    template_name = 'content_interactions/denounce_modal.html'
+    form_class = DenounceForm
+
+    def get_initial(self):
+        content_type_pk = self.request.GET.get('content_type', None)
+        content_type = ContentType.objects.get_for_id(content_type_pk) if content_type_pk else None
+        object_pk = self.request.GET.get('object_pk', None)
+        return {
+            'content_type': content_type,
+            'object_pk': object_pk,
+            'user': self.request.user
+        }
+
+    def form_valid(self, form):
+        """
+        If the form is valid, toggle denounce status.
+        """
+        form.save_denounce()
+        context = {
+            'successMsg': force_text(MODAL_DENOUNCE_SUCCESS_MESSAGE),
         }
         return HttpResponse(json.dumps(context), content_type='application/json')
 
