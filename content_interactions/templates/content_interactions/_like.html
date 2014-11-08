@@ -1,0 +1,10 @@
+{% load content_interaction_tags %}
+
+{% with item|liked_by:user as liked %}
+    <a {% if user.is_authenticated %} href="{% url 'like_item' %}" class="toggle_relationship" data-model="content_interactions.tests.models.Item" data-pk="{{ item.pk }}" {% endif %}>
+        LIKE
+        <i>
+            <sub class="label label-success" style="margin-left: -6px; font-size: 10px; padding: 1px;">{{ item.likes|intmin }}</sub>
+        </i>
+    </a>
+{% endwith %}

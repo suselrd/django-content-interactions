@@ -19,7 +19,7 @@ MODAL_VALIDATION_ERROR_MESSAGE = _(u"A validation error has occurred.")
 MODAL_SHARE_SUCCESS_MESSAGE = _(u"The item has been successfully shared.")
 MODAL_RECOMMEND_SUCCESS_MESSAGE = _(u"The item has been successfully recommended.")
 MODAL_RATE_SUCCESS_MESSAGE = _(u"The item has been successfully rated.")
-MODAL_DENOUNCE_SUCCESS_MESSAGE = _(u"The operation has been successfully done.")
+MODAL_DENOUNCE_SUCCESS_MESSAGE = _(u"The item has been successfully denounced.")
 
 
 class JSONResponseMixin(object):
@@ -49,6 +49,9 @@ class JSONResponseMixin(object):
 
 class LikeView(JSONResponseMixin, View):
 
+    def dispatch(self, request, *args, **kwargs):
+        return super(LikeView, self).dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         try:
             model = import_by_path(request.POST['model'])
@@ -58,14 +61,17 @@ class LikeView(JSONResponseMixin, View):
             if instance.liked_by(request.user):
                 instance.unlike(request.user)
                 tooltip = _(u"Like")
+                toggle_status = False
             else:
                 instance.like(request.user)
                 tooltip = _(u"Unlike")
+                toggle_status = True
 
             likes = instance.likes
 
             return self.render_to_response({
                 'result': True,
+                'toggle_status': toggle_status,
                 'counter': likes,
                 'counterStr': intmin(likes),
                 'tooltip': force_text(tooltip)
@@ -75,6 +81,9 @@ class LikeView(JSONResponseMixin, View):
             logger.exception(e)
             return self.render_to_response({'result': False})
         except ImproperlyConfigured as e:
+            logger.exception(e)
+            return self.render_to_response({'result': False})
+        except Exception as e:
             logger.exception(e)
             return self.render_to_response({'result': False})
 
@@ -90,14 +99,17 @@ class FavoriteView(JSONResponseMixin, View):
             if instance.favorite_of(request.user):
                 instance.delete_favorite(request.user)
                 tooltip = _(u"Mark as Favorite")
+                toggle_status = True
             else:
                 instance.mark_as_favorite(request.user)
                 tooltip = _(u"Not my Favorite")
+                toggle_status = True
 
             favorite_marks = instance.favorite_marks
 
             return self.render_to_response({
                 'result': True,
+                'toggle_status': toggle_status,
                 'counter': favorite_marks,
                 'counterStr': intmin(favorite_marks),
                 'tooltip': force_text(tooltip)
@@ -109,7 +121,7 @@ class FavoriteView(JSONResponseMixin, View):
 
 
 class ShareView(FormView):
-    template_name = 'content_interactions/share_modal.html'
+    template_name = 'content_interactions/share.html'
     form_class = ShareForm
 
     def get_initial(self):
@@ -142,7 +154,7 @@ class ShareView(FormView):
 
 
 class RecommendView(FormView):
-    template_name = 'content_interactions/recommend_modal.html'
+    template_name = 'content_interactions/recommend.html'
     form_class = RecommendForm
 
     def get_initial(self):
@@ -175,7 +187,7 @@ class RecommendView(FormView):
 
 
 class RateView(FormView):
-    template_name = 'content_interactions/rate_modal.html'
+    template_name = 'content_interactions/rate.html'
     form_class = RateForm
 
     def get_initial(self):
@@ -209,7 +221,7 @@ class RateView(FormView):
 
 
 class DenounceView(FormView):
-    template_name = 'content_interactions/denounce_modal.html'
+    template_name = 'content_interactions/denounce.html'
     form_class = DenounceForm
 
     def get_initial(self):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-content-interactions\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-26 00:23-0500\n"
+"POT-Creation-Date: 2014-11-08 08:29-0600\n"
 "PO-Revision-Date: 2014-09-26 00:23-0500\n"
 "Last-Translator: Susel Ruiz <suselrd@gmail.com>\n"
 "Language-Team: English\n"
@@ -47,18 +47,22 @@ msgstr ""
 msgid "The item has been successfully rated."
 msgstr ""
 
-#: views.py:59
+#: views.py:22
+msgid "The item has been successfully denounced."
+msgstr ""
+
+#: views.py:63
 msgid "Like"
 msgstr ""
 
-#: views.py:62
+#: views.py:67
 msgid "Unlike"
 msgstr ""
 
-#: views.py:91
+#: views.py:101
 msgid "Mark as Favorite"
 msgstr ""
 
-#: views.py:94
+#: views.py:105
 msgid "Not my Favorite"
 msgstr ""

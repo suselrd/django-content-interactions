@@ -2,6 +2,7 @@
 import logging
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
+from django.contrib.sites.models import Site
 from social_graph import Graph, EdgeType, ATTRIBUTES
 from . import LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY
 from .signals import (
@@ -114,94 +115,107 @@ def denounced_by_edge():
         logger.exception(e)
 
 
-class LikableMixin(object):
+class ContentInteractionMixin(object):
+
+    def get_site(self):
+        return getattr(self, 'site', Site.objects.get_current())
+
+
+class LikableMixin(ContentInteractionMixin):
     @property
     def likes(self):
-        return Graph().edge_count(self, liked_by_edge())
+        return Graph().edge_count(self, liked_by_edge(), self.get_site())
 
     def liked_by(self, user):
-        result = Graph().edges_get(self, liked_by_edge(), user)
+        result = Graph().edges_get(self, liked_by_edge(), user, self.get_site())
         return len(result) > 0
 
     def like(self, user):
-        _edge = Graph().edge_add(user, self, like_edge())
+        _edge = Graph().edge_add(user, self, like_edge(), self.get_site())
         if _edge:
             item_liked.send(sender=self.__class__, instance=self, user=user)
         return _edge
 
     def unlike(self, user):
-        _deleted = Graph().edge_delete(user, self, like_edge())
+        _deleted = Graph().edge_delete(user, self, like_edge(), self.get_site())
         if _deleted:
             item_disliked.send(sender=self.__class__, instance=self, user=user)
         return _deleted
 
 
-class FavoriteListItemMixin(object):
+class FavoriteListItemMixin(ContentInteractionMixin):
     @property
     def favorite_marks(self):
-        return Graph().edge_count(self, favorite_of_edge())
+        return Graph().edge_count(self, favorite_of_edge(), self.get_site())
 
     def favorite_of(self, user):
-        result = Graph().edges_get(self, favorite_of_edge(), user)
+        result = Graph().edges_get(self, favorite_of_edge(), user, self.get_site())
         return len(result) > 0
 
     def mark_as_favorite(self, user):
-        _edge = Graph().edge_add(user, self, favorite_edge())
+        _edge = Graph().edge_add(user, self, favorite_edge(), self.get_site())
         if _edge:
             item_marked_as_favorite.send(sender=self.__class__, instance=self, user=user)
         return _edge
 
     def delete_favorite(self, user):
-        _deleted = Graph().edge_delete(user, self, favorite_edge())
+        _deleted = Graph().edge_delete(user, self, favorite_edge(), self.get_site())
         if _deleted:
             item_unmarked_as_favorite.send(sender=self.__class__, instance=self, user=user)
         return _deleted
 
 
-class RateableMixin(object):
+class RateableMixin(ContentInteractionMixin):
     def rating(self, user):
-        _edge_list = Graph().edges_get(self, rated_by_edge(), user)
+        _edge_list = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
         return _edge_list[0][ATTRIBUTES]['rating'] if len(_edge_list) > 0 else None
 
     def rated_by(self, user):
-        result = Graph().edges_get(self, rated_by_edge(), user)
+        result = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
         return len(result) > 0
 
-    def save_rate(self, user, rating):
-        _edge = Graph().edge_add(user, self, rate_edge(), {'rating': rating})
+    def save_rate(self, user, rating, comment=None):
+        _edge = Graph().edge_add(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
         if _edge:
-            item_rated.send(sender=self.__class__, instance=self, user=user, rating=rating)
+            item_rated.send(sender=self.__class__, instance=self, user=user, rating=rating, comment=comment)
         return _edge
 
-    def change_rate(self, user, rating):
+    def change_rate(self, user, rating, comment=None):
         old_rating = self.rating(user)
-        _edge = Graph().edge_change(user, self, rate_edge(), {'rating': rating})
+        _edge = Graph().edge_change(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
         if _edge:
-            item_rate_modified.send(sender=self.__class__, instance=self, user=user, old_rating=old_rating, rating=rating)
+            item_rate_modified.send(
+                sender=self.__class__,
+                instance=self,
+                user=user,
+                old_rating=old_rating,
+                rating=rating,
+                comment=comment
+            )
         return _edge
 
 
-class DenounceTargetMixin(object):
+class DenounceTargetMixin(ContentInteractionMixin):
     @property
     def denounces(self):
-        return Graph().edge_count(self, denounced_by_edge())
+        return Graph().edge_count(self, denounced_by_edge(), self.get_site())
 
     def denounced_by(self, user):
-        result = Graph().edges_get(self, denounced_by_edge(), user)
+        result = Graph().edges_get(self, denounced_by_edge(), user, self.get_site())
         return len(result) > 0
 
     def denounce_comment(self, user):
-        _edge_list = Graph().edges_get(self, denounced_by_edge(), user)
+        _edge_list = Graph().edges_get(self, denounced_by_edge(), user, self.get_site())
         return _edge_list[0][ATTRIBUTES]['comment'] if len(_edge_list) > 0 else None
 
     def denounce(self, user, comment):
-        _edge = Graph().edge_add(user, self, denounce_edge(), {'comment': comment})
+        _edge = Graph().edge_add(user, self, denounce_edge(), self.get_site(), {'comment': comment})
         if _edge:
             item_denounced.send(sender=self.__class__, instance=self, user=user, comment=comment)
         return _edge
 
     def remove_denounce(self, user):
-        _deleted = Graph().edge_delete(user, self, denounce_edge())
+        _deleted = Graph().edge_delete(user, self, denounce_edge(), self.get_site())
         if _deleted:
             item_denounce_removed.send(sender=self.__class__, instance=self, user=user)
         return _deleted

@@ -37,6 +37,7 @@ class RateForm(forms.Form):
     content_type = forms.ModelChoiceField(ContentType.objects.all(), widget=forms.HiddenInput())
     object_pk = forms.CharField(widget=forms.HiddenInput())
     rating = forms.IntegerField(widget=forms.HiddenInput(), min_value=1, max_value=5)
+    comment = forms.CharField(max_length=500, widget=forms.Textarea(attrs={'rows': 4}), required=False)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
                  label_suffix=None, empty_permitted=False):
