@@ -33,4 +33,12 @@ urlpatterns = patterns('',
         login_required(RateView.as_view()),
         name="rate_item"
     ),
+
+    url(
+        r'^commented_rate/$',
+        login_required(RateView.as_view(
+            template_name = 'content_interactions/commented_rate.html'
+        )),
+        name="commented_rate_item"
+    ),
 )

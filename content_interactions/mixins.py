@@ -170,6 +170,13 @@ class RateableMixin(ContentInteractionMixin):
         _edge_list = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
         return _edge_list[0][ATTRIBUTES]['rating'] if len(_edge_list) > 0 else None
 
+    def full_rating(self, user):
+        _edge_list = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
+        return (
+            _edge_list[0][ATTRIBUTES]['rating'] if len(_edge_list) > 0 else None,
+            _edge_list[0][ATTRIBUTES]['comment'] if len(_edge_list) > 0 else None
+        )
+
     def rated_by(self, user):
         result = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
         return len(result) > 0

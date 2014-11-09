@@ -196,11 +196,13 @@ class RateView(FormView):
         object_pk = self.request.GET.get('object_pk', None)
         # find the related model
         model = content_type.get_object_for_this_type(**{'pk': object_pk}) if content_type and object_pk else None
+        full_rating = model.full_rating(self.request.user) if model and model.rated_by(self.request.user) else None
         return {
             'content_type': content_type,
             'object_pk': object_pk,
-            'rating': model.rating(self.request.user) if model and model.rated_by(self.request.user) else self.request.GET.get('min_rate', 0),
-            'user': self.request.user
+            'rating': full_rating[0] if full_rating else self.request.GET.get('min_rate', 0),
+            'user': self.request.user,
+            'comment': full_rating[1] if full_rating else None,
         }
 
     def form_valid(self, form):

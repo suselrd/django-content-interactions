@@ -50,9 +50,9 @@ class RateForm(forms.Form):
             **{'pk': self.cleaned_data['object_pk']}
         )
         if obj.rated_by(self.user):
-            obj.change_rate(self.user, self.cleaned_data['rating'])
+            obj.change_rate(self.user, self.cleaned_data['rating'], self.cleaned_data['comment'])
         else:
-            obj.save_rate(self.user, self.cleaned_data['rating'])
+            obj.save_rate(self.user, self.cleaned_data['rating'], self.cleaned_data['comment'])
 
 
 class DenounceForm(forms.Form):
