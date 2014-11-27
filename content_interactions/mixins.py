@@ -131,7 +131,7 @@ class LikableMixin(ContentInteractionMixin):
         return len(result) > 0
 
     def like(self, user):
-        _edge = Graph().edge_add(user, self, like_edge(), self.get_site())
+        _edge = Graph().edge_change(user, self, like_edge(), self.get_site(), {})
         if _edge:
             item_liked.send(sender=self.__class__, instance=self, user=user)
         return _edge
@@ -153,7 +153,7 @@ class FavoriteListItemMixin(ContentInteractionMixin):
         return len(result) > 0
 
     def mark_as_favorite(self, user):
-        _edge = Graph().edge_add(user, self, favorite_edge(), self.get_site())
+        _edge = Graph().edge_change(user, self, favorite_edge(), self.get_site(), {})
         if _edge:
             item_marked_as_favorite.send(sender=self.__class__, instance=self, user=user)
         return _edge
@@ -182,7 +182,7 @@ class RateableMixin(ContentInteractionMixin):
         return len(result) > 0
 
     def save_rate(self, user, rating, comment=None):
-        _edge = Graph().edge_add(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
+        _edge = Graph().edge_change(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
         if _edge:
             item_rated.send(sender=self.__class__, instance=self, user=user, rating=rating, comment=comment)
         return _edge
@@ -216,7 +216,7 @@ class DenounceTargetMixin(ContentInteractionMixin):
         return _edge_list[0][ATTRIBUTES]['comment'] if len(_edge_list) > 0 else None
 
     def denounce(self, user, comment):
-        _edge = Graph().edge_add(user, self, denounce_edge(), self.get_site(), {'comment': comment})
+        _edge = Graph().edge_change(user, self, denounce_edge(), self.get_site(), {'comment': comment})
         if _edge:
             item_denounced.send(sender=self.__class__, instance=self, user=user, comment=comment)
         return _edge
