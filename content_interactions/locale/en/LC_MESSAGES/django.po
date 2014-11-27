@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-content-interactions\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-08 08:29-0600\n"
-"PO-Revision-Date: 2014-09-26 00:23-0500\n"
+"POT-Creation-Date: 2014-11-27 13:12-0600\n"
+"PO-Revision-Date: 2014-11-27 00:23-0500\n"
 "Last-Translator: Susel Ruiz <suselrd@gmail.com>\n"
 "Language-Team: English\n"
 "Language: en\n"
@@ -65,4 +65,12 @@ msgstr ""
 
 #: views.py:105
 msgid "Not my Favorite"
+msgstr ""
+
+#: views.py:251
+msgid "Delete Denounce"
+msgstr ""
+
+#: views.py:251
+msgid "Denounce"
 msgstr ""

@@ -77,6 +77,8 @@ class DenounceForm(forms.Form):
     def save_denounce(self):
         if not self.obj.denounced_by(self.user):
             self.obj.denounce(self.user, self.cleaned_data['comment'])
+            return True
         else:
             self.obj.remove_denounce(self.user)
+            return False
 

@@ -240,9 +240,15 @@ class DenounceView(FormView):
         """
         If the form is valid, toggle denounce status.
         """
-        form.save_denounce()
+        denounced = form.save_denounce()
+        denounces = form.obj.denounces
         context = {
             'successMsg': force_text(MODAL_DENOUNCE_SUCCESS_MESSAGE),
+            'result': True,
+            'toggle_status': denounced,
+            'counter': denounces,
+            'counterStr': intmin(denounces),
+            'tooltip': force_text(_(u"Delete Denounce") if denounced else _(u"Denounce"))
         }
         return HttpResponse(json.dumps(context), content_type='application/json')
 

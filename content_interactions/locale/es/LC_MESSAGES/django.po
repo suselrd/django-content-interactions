@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-content-interactions\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-08 08:29-0600\n"
-"PO-Revision-Date: 2014-09-26 00:23-0500\n"
+"POT-Creation-Date: 2014-11-27 13:16-0600\n"
+"PO-Revision-Date: 2014-11-27 00:23-0500\n"
 "Last-Translator: Susel Ruiz <suselrd@gmail.com>\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
@@ -49,7 +49,6 @@ msgid "The item has been successfully rated."
 msgstr "El elemento ha sido calificado satisfactoriamente."
 
 #: views.py:22
-#, fuzzy
 msgid "The item has been successfully denounced."
 msgstr "El elemento ha sido denunciado satisfactoriamente."
 
@@ -68,3 +67,11 @@ msgstr "Marcar como Favorito"
 #: views.py:105
 msgid "Not my Favorite"
 msgstr "Desmarcar como Favorito"
+
+#: views.py:251
+msgid "Delete Denounce"
+msgstr "Eliminar Denuncia"
+
+#: views.py:251
+msgid "Denounce"
+msgstr "Denunciar"

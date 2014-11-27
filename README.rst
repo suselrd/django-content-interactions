@@ -9,6 +9,10 @@ Like, Mark as Favorite, Rate, Share, Recommend, Denounce...
 Changelog
 =========
 
+0.2.4
+-----
++ Improving denounce flow.
+
 0.2.3
 -----
 + Templates tags expecting objects can now accept a tuple (content_type_pk, object_pk)
