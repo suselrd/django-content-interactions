@@ -1,22 +1,18 @@
 /* Creates a new interaction class */
 function iClazz(SuperClass, methods) {
 
-    var SubClass = function () {
-        SuperClass.apply(this, arguments);
+    var subClass = function () {
+        this.config.apply(this, arguments);
     };
+    subClass.prototype = Object.create(SuperClass.prototype);
+    subClass.prototype.constructor = subClass;
+    subClass.prototype.parent = SuperClass.prototype;
+    subClass.prototype = $.extend(subClass.prototype, methods);
 
-    SubClass.prototype = Object.create(SuperClass.prototype);
-    SubClass.prototype = $.extend(SubClass.prototype, methods);
-
-    return SubClass;
+    return subClass;
 }
 
-
-var Interaction = function() {
-    this.options = {};
-};
-
-$.extend(Interaction.prototype, {
+var Interaction = iClazz(Object, {
     config: function(options) {},
 
     init: function() {}
