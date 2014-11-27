@@ -1,9 +1,20 @@
 # coding=utf-8
+from django.contrib.contenttypes.models import ContentType
 from django import template
+from django.core.exceptions import ObjectDoesNotExist
 from ..mixins import LikableMixin, FavoriteListItemMixin, RateableMixin, DenounceTargetMixin
 from ..utils import intmin as intmin_function
 
 register = template.Library()
+
+
+def tuple_to_obj(t):
+    try:
+        obj = ContentType.objects.get(pk=t[0]).get_object_for_this_type(
+            **{'pk': t[1]}
+        )
+    finally:
+        return obj or None
 
 
 @register.filter
@@ -15,6 +26,8 @@ def liked_by(obj, user):
         return False
     if not obj:
         return False
+    if isinstance(obj, tuple):
+        obj = tuple_to_obj(obj)
     if not isinstance(obj, LikableMixin):
         raise Exception("LikableMixin instance expected")
     return obj.liked_by(user)
@@ -29,6 +42,8 @@ def favorite_of(obj, user):
         return False
     if not obj:
         return False
+    if isinstance(obj, tuple):
+        obj = tuple_to_obj(obj)
     if not isinstance(obj, FavoriteListItemMixin):
         raise Exception("FavoriteListItemMixin instance expected")
     return obj.favorite_of(user)
@@ -43,6 +58,8 @@ def rating_of(obj, user):
         return False
     if not obj:
         return False
+    if isinstance(obj, tuple):
+        obj = tuple_to_obj(obj)
     if not isinstance(obj, RateableMixin):
         raise Exception("RateableMixin instance expected")
     return obj.rating(user)
@@ -57,6 +74,8 @@ def denounced_by(obj, user):
         return False
     if not obj:
         return False
+    if isinstance(obj, tuple):
+        obj = tuple_to_obj(obj)
     if not isinstance(obj, DenounceTargetMixin):
         raise Exception("DenounceTargetMixin instance expected")
     return obj.denounced_by(user)

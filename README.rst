@@ -9,6 +9,10 @@ Like, Mark as Favorite, Rate, Share, Recommend, Denounce...
 Changelog
 =========
 
+0.2.3
+-----
++ Templates tags expecting objects can now accept a tuple (content_type_pk, object_pk)
+
 0.2.2
 -----
 + Fix in mixins' edge creation methods (when an edge type allows only one edge per objects pair, use edge_change instead of edge_add).
