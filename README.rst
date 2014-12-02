@@ -9,6 +9,10 @@ Like, Mark as Favorite, Rate, Share, Recommend, Denounce...
 Changelog
 =========
 
+0.3.0
+-----
++ Upgrading to django-social-graph 0.2.0
+
 0.2.4
 -----
 + Improving denounce flow.

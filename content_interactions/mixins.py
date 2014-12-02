@@ -18,6 +18,8 @@ from .signals import (
 
 logger = logging.getLogger(__name__)
 
+graph = Graph()
+
 
 def like_edge():
     like = cache.get('LIKE_EDGE_TYPE')
@@ -124,20 +126,19 @@ class ContentInteractionMixin(object):
 class LikableMixin(ContentInteractionMixin):
     @property
     def likes(self):
-        return Graph().edge_count(self, liked_by_edge(), self.get_site())
+        return graph.edge_count(self, liked_by_edge(), self.get_site())
 
     def liked_by(self, user):
-        result = Graph().edges_get(self, liked_by_edge(), user, self.get_site())
-        return len(result) > 0
+        return graph.edge_get(self, liked_by_edge(), user, self.get_site()) is not None
 
     def like(self, user):
-        _edge = Graph().edge_change(user, self, like_edge(), self.get_site(), {})
+        _edge = graph.edge(user, self, like_edge(), self.get_site(), {})
         if _edge:
             item_liked.send(sender=self.__class__, instance=self, user=user)
         return _edge
 
     def unlike(self, user):
-        _deleted = Graph().edge_delete(user, self, like_edge(), self.get_site())
+        _deleted = graph.no_edge(user, self, like_edge(), self.get_site())
         if _deleted:
             item_disliked.send(sender=self.__class__, instance=self, user=user)
         return _deleted
@@ -146,20 +147,19 @@ class LikableMixin(ContentInteractionMixin):
 class FavoriteListItemMixin(ContentInteractionMixin):
     @property
     def favorite_marks(self):
-        return Graph().edge_count(self, favorite_of_edge(), self.get_site())
+        return graph.edge_count(self, favorite_of_edge(), self.get_site())
 
     def favorite_of(self, user):
-        result = Graph().edges_get(self, favorite_of_edge(), user, self.get_site())
-        return len(result) > 0
+        return graph.edge_get(self, favorite_of_edge(), user, self.get_site()) is not None
 
     def mark_as_favorite(self, user):
-        _edge = Graph().edge_change(user, self, favorite_edge(), self.get_site(), {})
+        _edge = graph.edge(user, self, favorite_edge(), self.get_site(), {})
         if _edge:
             item_marked_as_favorite.send(sender=self.__class__, instance=self, user=user)
         return _edge
 
     def delete_favorite(self, user):
-        _deleted = Graph().edge_delete(user, self, favorite_edge(), self.get_site())
+        _deleted = graph.no_edge(user, self, favorite_edge(), self.get_site())
         if _deleted:
             item_unmarked_as_favorite.send(sender=self.__class__, instance=self, user=user)
         return _deleted
@@ -167,29 +167,28 @@ class FavoriteListItemMixin(ContentInteractionMixin):
 
 class RateableMixin(ContentInteractionMixin):
     def rating(self, user):
-        _edge_list = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
-        return _edge_list[0][ATTRIBUTES]['rating'] if len(_edge_list) > 0 else None
+        _edge = graph.edge_get(self, rated_by_edge(), user, self.get_site())
+        return _edge[ATTRIBUTES]['rating'] if _edge is not None else None
 
     def full_rating(self, user):
-        _edge_list = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
+        _edge = graph.edge_get(self, rated_by_edge(), user, self.get_site())
         return (
-            _edge_list[0][ATTRIBUTES]['rating'] if len(_edge_list) > 0 else None,
-            _edge_list[0][ATTRIBUTES]['comment'] if len(_edge_list) > 0 else None
+            _edge[ATTRIBUTES]['rating'] if _edge is not None else None,
+            _edge[ATTRIBUTES]['comment'] if _edge is not None else None
         )
 
     def rated_by(self, user):
-        result = Graph().edges_get(self, rated_by_edge(), user, self.get_site())
-        return len(result) > 0
+        return graph.edge_get(self, rated_by_edge(), user, self.get_site()) is not None
 
     def save_rate(self, user, rating, comment=None):
-        _edge = Graph().edge_change(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
+        _edge = graph.edge(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
         if _edge:
             item_rated.send(sender=self.__class__, instance=self, user=user, rating=rating, comment=comment)
         return _edge
 
     def change_rate(self, user, rating, comment=None):
         old_rating = self.rating(user)
-        _edge = Graph().edge_change(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
+        _edge = graph.edge(user, self, rate_edge(), self.get_site(), {'rating': rating, 'comment': comment})
         if _edge:
             item_rate_modified.send(
                 sender=self.__class__,
@@ -205,31 +204,30 @@ class RateableMixin(ContentInteractionMixin):
 class DenounceTargetMixin(ContentInteractionMixin):
     @property
     def denounces(self):
-        return Graph().edge_count(self, denounced_by_edge(), self.get_site())
+        return graph.edge_count(self, denounced_by_edge(), self.get_site())
 
     def denounced_by(self, user):
-        result = Graph().edges_get(self, denounced_by_edge(), user, self.get_site())
-        return len(result) > 0
+        return graph.edge_get(self, denounced_by_edge(), user, self.get_site()) is not None
 
     def denounce_comment(self, user):
-        _edge_list = Graph().edges_get(self, denounced_by_edge(), user, self.get_site())
-        return _edge_list[0][ATTRIBUTES]['comment'] if len(_edge_list) > 0 else None
+        _edge = graph.edge_get(self, denounced_by_edge(), user, self.get_site())
+        return _edge[ATTRIBUTES]['comment'] if _edge is not None else None
 
     def denounce(self, user, comment):
-        _edge = Graph().edge_change(user, self, denounce_edge(), self.get_site(), {'comment': comment})
+        _edge = graph.edge(user, self, denounce_edge(), self.get_site(), {'comment': comment})
         if _edge:
             item_denounced.send(sender=self.__class__, instance=self, user=user, comment=comment)
         return _edge
 
     def remove_denounce(self, user):
-        _deleted = Graph().edge_delete(user, self, denounce_edge(), self.get_site())
+        _deleted = graph.no_edge(user, self, denounce_edge(), self.get_site())
         if _deleted:
             item_denounce_removed.send(sender=self.__class__, instance=self, user=user)
         return _deleted
 
 
 class LikableManagerMixin(object):
-    graph = Graph()
+    graph = graph
 
     def liked_by(self, user):
         like = like_edge()
@@ -240,7 +238,7 @@ class LikableManagerMixin(object):
 
 
 class FavoriteListItemManagerMixin(object):
-    graph = Graph()
+    graph = graph
 
     def favorites(self, user):
         favorite = favorite_edge()
@@ -251,7 +249,7 @@ class FavoriteListItemManagerMixin(object):
 
 
 class DenounceTargetManagerMixin(object):
-    graph = Graph()
+    graph = graph
 
     def denounced_by(self, user):
         denounce = denounce_edge()
