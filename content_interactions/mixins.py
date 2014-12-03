@@ -3,7 +3,7 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.contrib.sites.models import Site
-from social_graph import Graph, EdgeType, ATTRIBUTES
+from social_graph import Graph, EdgeType
 from . import LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY
 from .signals import (
     item_liked,
@@ -168,13 +168,13 @@ class FavoriteListItemMixin(ContentInteractionMixin):
 class RateableMixin(ContentInteractionMixin):
     def rating(self, user):
         _edge = graph.edge_get(self, rated_by_edge(), user, self.get_site())
-        return _edge[ATTRIBUTES]['rating'] if _edge is not None else None
+        return _edge.attributes['rating'] if _edge is not None else None
 
     def full_rating(self, user):
         _edge = graph.edge_get(self, rated_by_edge(), user, self.get_site())
         return (
-            _edge[ATTRIBUTES]['rating'] if _edge is not None else None,
-            _edge[ATTRIBUTES]['comment'] if _edge is not None else None
+            _edge.attributes['rating'] if _edge is not None else None,
+            _edge.attributes['comment'] if _edge is not None else None
         )
 
     def rated_by(self, user):
@@ -211,7 +211,7 @@ class DenounceTargetMixin(ContentInteractionMixin):
 
     def denounce_comment(self, user):
         _edge = graph.edge_get(self, denounced_by_edge(), user, self.get_site())
-        return _edge[ATTRIBUTES]['comment'] if _edge is not None else None
+        return _edge.attributes['comment'] if _edge is not None else None
 
     def denounce(self, user, comment):
         _edge = graph.edge(user, self, denounce_edge(), self.get_site(), {'comment': comment})

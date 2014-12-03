@@ -8,6 +8,9 @@ Like, Mark as Favorite, Rate, Share, Recommend, Denounce...
 
 Changelog
 =========
+0.3.1
+-----
++ Fix bug in mixins.
 
 0.3.0
 -----
