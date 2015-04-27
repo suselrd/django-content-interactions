@@ -9,8 +9,8 @@ from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View, FormView
-from .forms import ShareForm, RecommendForm, RateForm, DenounceForm
-from .signals import item_shared, item_recommended
+from .forms import ShareForm, RateForm, DenounceForm
+from .signals import item_shared
 from .utils import intmin
 
 logger = logging.getLogger(__name__)
@@ -48,9 +48,6 @@ class JSONResponseMixin(object):
 
 
 class LikeView(JSONResponseMixin, View):
-
-    def dispatch(self, request, *args, **kwargs):
-        return super(LikeView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         try:
@@ -140,42 +137,10 @@ class ShareView(FormView):
             item_shared.send(form.object.__class__,
                              instance=form.object,
                              user=self.request.user,
-                             addressee_list=form.addressee_list)
-        context = {
-            'successMsg': force_text(MODAL_SHARE_SUCCESS_MESSAGE),
-        }
-        return HttpResponse(json.dumps(context), content_type='application/json')
-
-    def form_invalid(self, form):
-        context = {
-            'errorMsg': force_text(MODAL_VALIDATION_ERROR_MESSAGE)
-        }
-        return HttpResponseBadRequest(json.dumps(context), content_type='application/json')
-
-
-class RecommendView(FormView):
-    template_name = 'content_interactions/recommend.html'
-    form_class = RecommendForm
-
-    def get_initial(self):
-        content_type_pk = self.request.REQUEST.get('content_type', None)
-        return {
-            'content_type': ContentType.objects.get(pk=content_type_pk) if content_type_pk else None,
-            'object_pk': self.request.REQUEST.get('object_pk', None)
-        }
-
-    def form_valid(self, form):
-        """
-        If the form is valid, share item.
-        """
-        if form.object:
-            item_recommended.send(form.object.__class__,
-                             instance=form.object,
-                             user=self.request.user,
                              addressee_list=form.addressee_list,
                              comment=form.cleaned_data['comment'])
         context = {
-            'successMsg': force_text(MODAL_RECOMMEND_SUCCESS_MESSAGE),
+            'successMsg': force_text(MODAL_SHARE_SUCCESS_MESSAGE),
         }
         return HttpResponse(json.dumps(context), content_type='application/json')
 

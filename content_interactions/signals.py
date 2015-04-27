@@ -9,6 +9,4 @@ item_rated = Signal(providing_args=['instance', 'user', 'rating', 'comment'])
 item_rate_modified = Signal(providing_args=['instance', 'user', 'old_rating', 'rating', 'comment'])
 item_denounced = Signal(providing_args=['instance', 'user', 'comment'])
 item_denounce_removed = Signal(providing_args=['instance', 'user'])
-
-item_shared = Signal(providing_args=['instance', 'user', 'addressee_list'])
-item_recommended = Signal(providing_args=['instance', 'user', 'addressee_list', 'comment'])
+item_shared = Signal(providing_args=['instance', 'user', 'addressee_list', 'comment'])

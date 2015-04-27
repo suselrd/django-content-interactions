@@ -4,10 +4,16 @@ Django Content Interactions
 
 Common User-Content Interactions for Django>=1.6.1
 
-Like, Mark as Favorite, Rate, Share, Recommend, Denounce...
+Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.4.0
+-----
++ Added Stats functionality.
++ Unified Share and Recommend into only one possible interaction: Share (with an optional comment)
+
+
 0.3.1
 -----
 + Fix bug in mixins.

@@ -3,7 +3,7 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.contrib.sites.models import Site
-from social_graph import Graph, EdgeType
+from social_graph import Graph, EdgeType, ATTRIBUTES
 from . import LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY
 from .signals import (
     item_liked,
@@ -166,6 +166,25 @@ class FavoriteListItemMixin(ContentInteractionMixin):
 
 
 class RateableMixin(ContentInteractionMixin):
+
+    @property
+    def ratings(self):
+        return graph.edge_count(self, rated_by_edge(), self.get_site())
+
+    @property
+    def avg_rating(self):
+        return (
+            5 * self.rating_of(5)
+            + 4 * self.rating_of(4)
+            + 3 * self.rating_of(3)
+            + 2 * self.rating_of(2)
+            + self.rating_of(1)
+        )/(self.ratings * float(1)) if self.ratings else 0
+
+    def rating_of(self, rating_value):
+        _edges = graph.edge_range(self, rated_by_edge(), 0, self.ratings, self.get_site())
+        return len([_edge for _edge in _edges if _edge[ATTRIBUTES]['rating'] == rating_value])
+
     def rating(self, user):
         _edge = graph.edge_get(self, rated_by_edge(), user, self.get_site())
         return _edge.attributes['rating'] if _edge is not None else None

@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
-from .views import LikeView, FavoriteView, ShareView, RecommendView, RateView, DenounceView
+from .views import LikeView, FavoriteView, ShareView, RateView, DenounceView
 
 urlpatterns = patterns('',
     url(
@@ -20,12 +20,6 @@ urlpatterns = patterns('',
         r'^share/$',
         login_required(ShareView.as_view()),
         name="share_item"
-    ),
-
-    url(
-        r'^recommend/$',
-        login_required(RecommendView.as_view()),
-        name="recommend_item"
     ),
 
     url(

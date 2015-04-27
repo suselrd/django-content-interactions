@@ -5,14 +5,15 @@ from django.core.exceptions import ValidationError
 from django.forms.util import ErrorList
 
 
-class ReferForm(forms.Form):
+class ShareForm(forms.Form):
     content_type = forms.ModelChoiceField(ContentType.objects.all(), widget=forms.HiddenInput())
     object_pk = forms.IntegerField(widget=forms.HiddenInput())
     addressee = forms.CharField(max_length=5000)
+    comment = forms.CharField(max_length=500, widget=forms.Textarea(attrs={'rows': 4}), required=False)
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
                  label_suffix=None, empty_permitted=False):
-        super(ReferForm, self).__init__(data, files, auto_id, prefix, initial, error_class, label_suffix,
+        super(ShareForm, self).__init__(data, files, auto_id, prefix, initial, error_class, label_suffix,
                                         empty_permitted)
         content_type = initial.get('content_type', None)
         object_pk = initial.get('object_pk', None)
@@ -23,14 +24,6 @@ class ReferForm(forms.Form):
         addressee = self.cleaned_data['addressee']
         self.addressee_list = addressee.split(',')
         return addressee
-
-
-class ShareForm(ReferForm):
-    pass
-
-
-class RecommendForm(ReferForm):
-    comment = forms.CharField(max_length=500, widget=forms.Textarea(attrs={'rows': 4}))
 
 
 class RateForm(forms.Form):
