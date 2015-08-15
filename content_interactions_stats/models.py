@@ -17,3 +17,4 @@ class Stats(models.Model):
     class Meta:
         verbose_name = _('Item Stats')
         verbose_name_plural = _('Item Stats')
+        unique_together = ('content_type', 'object_pk')

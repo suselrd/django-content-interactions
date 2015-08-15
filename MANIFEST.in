@@ -1,3 +1,4 @@
 include LICENSE AUTHORS.rst README.rst
 recursive-include content_interactions *.html *.txt *.xml *.po *.mo *.js
+recursive-include content_interactions_stats *.html *.txt *.xml *.po *.mo *.js
 

@@ -2,12 +2,12 @@
 from django.conf import settings
 
 CONTENT_INTERACTIONS_STATS_PROCESSORS = getattr(settings, 'CONTENT_INTERACTIONS_STATS_PROCESSORS', (
-    'content_interactions.stats.processors.Likes',
-    'content_interactions.stats.processors.FavoriteMarks',
-    'content_interactions.stats.processors.Shares',
-    'content_interactions.stats.processors.Denounces',
-    'content_interactions.stats.processors.Ratings',
-    'content_interactions.stats.processors.Visits',
+    'content_interactions_stats.processors.Likes',
+    'content_interactions_stats.processors.FavoriteMarks',
+    'content_interactions_stats.processors.Shares',
+    'content_interactions_stats.processors.Denounces',
+    'content_interactions_stats.processors.Ratings',
+    'content_interactions_stats.processors.Visits',
 ))
 
 CONTENT_INTERACTIONS_STATS_PROCESSING_DELAY = getattr(

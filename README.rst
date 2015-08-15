@@ -8,11 +8,15 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+
+0.4.1
+-----
++ Renamed stats application, to be more specific.
+
 0.4.0
 -----
 + Added Stats functionality.
 + Unified Share and Recommend into only one possible interaction: Share (with an optional comment)
-
 
 0.3.1
 -----

@@ -26,7 +26,7 @@ class TestContentInteractions(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('object', response.context_data)
 
-        from ..stats.models import Stats
+        from content_interactions_stats.models import Stats
         obj_stats = Stats.objects.get(content_type=ContentType.objects.get_for_model(self.object), object_pk=self.object.pk)
         self.assertEqual(obj_stats.visits, 1)
 
@@ -42,7 +42,7 @@ class TestContentInteractions(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-        from ..stats.models import Stats
+        from content_interactions_stats.models import Stats
         obj_stats = Stats.objects.get(content_type=ContentType.objects.get_for_model(self.object), object_pk=self.object.pk)
         self.assertEqual(obj_stats.shares, 1)
 
@@ -56,7 +56,7 @@ class TestContentInteractions(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-        from ..stats.models import Stats
+        from content_interactions_stats.models import Stats
         obj_stats = Stats.objects.get(content_type=ContentType.objects.get_for_model(self.object), object_pk=self.object.pk)
         self.assertEqual(obj_stats.likes, 1)
 
@@ -77,7 +77,7 @@ class TestContentInteractions(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-        from ..stats.models import Stats
+        from content_interactions_stats.models import Stats
         obj_stats = Stats.objects.get(content_type=ContentType.objects.get_for_model(self.object), object_pk=self.object.pk)
         self.assertEqual(obj_stats.favorite_marks, 1)
 
@@ -100,7 +100,7 @@ class TestContentInteractions(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-        from ..stats.models import Stats
+        from content_interactions_stats.models import Stats
         obj_stats = Stats.objects.get(content_type=ContentType.objects.get_for_model(self.object), object_pk=self.object.pk)
         self.assertEqual(obj_stats.denounces, 1)
 
@@ -124,7 +124,7 @@ class TestContentInteractions(TestCase):
         })
         self.assertEqual(response.status_code, 200)
 
-        from ..stats.models import Stats
+        from content_interactions_stats.models import Stats
         obj_stats = Stats.objects.get(content_type=ContentType.objects.get_for_model(self.object), object_pk=self.object.pk)
         self.assertEqual(obj_stats.ratings, 1)
         self.assertEqual(obj_stats.rating_5_count, 1)

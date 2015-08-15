@@ -118,4 +118,3 @@ def item_denounce_removed_process(item_id, item_content_type):
     stats_obj, created = Stats.objects.get_or_create(object_pk=item_id, content_type=item_content_type)
     stats_obj.denounces = F('denounces')-1
     stats_obj.save()
-

@@ -9,9 +9,9 @@ from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View, FormView
-from .forms import ShareForm, RateForm, DenounceForm
-from .signals import item_shared
-from .utils import intmin
+from forms import ShareForm, RateForm, DenounceForm
+from signals import item_shared
+from utils import intmin
 
 logger = logging.getLogger(__name__)
 

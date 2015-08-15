@@ -1,12 +1,14 @@
 # coding=utf-8
 from django.contrib.contenttypes.models import ContentType
-from ..mixins import ContentInteractionMixin, LikableMixin, FavoriteListItemMixin, DenounceTargetMixin, RateableMixin
+from content_interactions.mixins import (
+    ContentInteractionMixin, LikableMixin, FavoriteListItemMixin, DenounceTargetMixin, RateableMixin
+)
 from settings import *
 
 
 @property
 def stats(self):
-    from models import Stats
+    from content_interactions_stats.models import Stats
     result, created = Stats.objects.get_or_create(
         content_type=ContentType.objects.get_for_model(self.__class__), object_pk=self.pk
     )

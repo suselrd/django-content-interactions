@@ -10,6 +10,7 @@ from settings import (
 )
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def like_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_LIKE_PROCESSING_DELAY:
         try:
@@ -22,6 +23,7 @@ def like_handler(instance, **kwargs):
     sync_item_like_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def dislike_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_LIKE_PROCESSING_DELAY:
         try:
@@ -34,6 +36,7 @@ def dislike_handler(instance, **kwargs):
     sync_item_dislike_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def new_rating_handler(instance, rating, **kwargs):
     if CONTENT_INTERACTIONS_RATE_PROCESSING_DELAY:
         try:
@@ -46,11 +49,14 @@ def new_rating_handler(instance, rating, **kwargs):
     sync_item_new_rating_process(instance.pk, ContentType.objects.get_for_model(instance), rating)
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def updated_rating_handler(instance, rating, old_rating, **kwargs):
     if CONTENT_INTERACTIONS_RATE_PROCESSING_DELAY:
         try:
             from tasks import item_updated_rating_process
-            item_updated_rating_process.delay(instance.pk, ContentType.objects.get_for_model(instance), old_rating, rating)
+            item_updated_rating_process.delay(
+                instance.pk, ContentType.objects.get_for_model(instance), old_rating, rating
+            )
             return
         except ImportError:
             pass
@@ -58,6 +64,7 @@ def updated_rating_handler(instance, rating, old_rating, **kwargs):
     sync_item_updated_rating_process(instance.pk, ContentType.objects.get_for_model(instance), old_rating, rating)
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def update_cached_rating(instance, **kwargs):
     instance.rating = (
         5 * instance.rating_5_count
@@ -69,6 +76,7 @@ def update_cached_rating(instance, **kwargs):
     return instance
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def favorite_mark_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_FAVORITE_PROCESSING_DELAY:
         try:
@@ -81,6 +89,7 @@ def favorite_mark_handler(instance, **kwargs):
     sync_item_marked_favorite_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def favorite_unmark_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_FAVORITE_PROCESSING_DELAY:
         try:
@@ -93,6 +102,7 @@ def favorite_unmark_handler(instance, **kwargs):
     sync_item_unmarked_favorite_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def denounce_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_DENOUNCE_PROCESSING_DELAY:
         try:
@@ -105,6 +115,7 @@ def denounce_handler(instance, **kwargs):
     sync_item_denounced_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def denounce_remove_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_DENOUNCE_PROCESSING_DELAY:
         try:
@@ -117,6 +128,7 @@ def denounce_remove_handler(instance, **kwargs):
     sync_item_denounce_removed_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def share_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_SHARE_PROCESSING_DELAY:
         try:
@@ -129,6 +141,7 @@ def share_handler(instance, **kwargs):
     sync_item_shared_process(instance.pk, ContentType.objects.get_for_model(instance))
 
 
+#noinspection PyUnresolvedReferences,PyUnusedLocal
 def visit_handler(instance, **kwargs):
     if CONTENT_INTERACTIONS_VISIT_PROCESSING_DELAY:
         try:

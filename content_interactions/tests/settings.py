@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'social_graph',
     'content_interactions',
-    'content_interactions.stats',
+    'content_interactions_stats',
     'content_interactions.tests'
 ]
 

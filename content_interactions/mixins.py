@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.contrib.sites.models import Site
 from social_graph import Graph, EdgeType, ATTRIBUTES
 from . import LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY
-from .signals import (
+from signals import (
     item_liked,
     item_disliked,
     item_marked_as_favorite,
@@ -252,7 +252,10 @@ class LikableManagerMixin(object):
         like = like_edge()
         count = self.graph.edge_count(user, like)
         content_type = ContentType.objects.get_for_model(self.model)
-        ids = [node.pk for node, attributes, time in self.graph.edge_range(user, like, 0, count) if ContentType.objects.get_for_model(node) == content_type]
+        ids = [
+            node.pk for node, attributes, time in self.graph.edge_range(user, like, 0, count)
+            if ContentType.objects.get_for_model(node) == content_type
+        ]
         return self.get_queryset().filter(pk__in=ids)
 
 
@@ -263,7 +266,10 @@ class FavoriteListItemManagerMixin(object):
         favorite = favorite_edge()
         count = self.graph.edge_count(user, favorite)
         content_type = ContentType.objects.get_for_model(self.model)
-        ids = [node.pk for node, attributes, time in self.graph.edge_range(user, favorite, 0, count) if ContentType.objects.get_for_model(node) == content_type]
+        ids = [
+            node.pk for node, attributes, time in self.graph.edge_range(user, favorite, 0, count)
+            if ContentType.objects.get_for_model(node) == content_type
+        ]
         return self.get_queryset().filter(pk__in=ids)
 
 
@@ -274,5 +280,8 @@ class DenounceTargetManagerMixin(object):
         denounce = denounce_edge()
         count = self.graph.edge_count(user, denounce)
         content_type = ContentType.objects.get_for_model(self.model)
-        ids = [node.pk for node, attributes, time in self.graph.edge_range(user, denounce, 0, count) if ContentType.objects.get_for_model(node) == content_type]
+        ids = [
+            node.pk for node, attributes, time in self.graph.edge_range(user, denounce, 0, count)
+            if ContentType.objects.get_for_model(node) == content_type
+        ]
         return self.get_queryset().filter(pk__in=ids)

@@ -3,7 +3,7 @@ from django.db.models.signals import pre_save
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from social_graph import object_visited
-from ..signals import (
+from content_interactions.signals import (
     item_liked,
     item_disliked,
     item_rated,
