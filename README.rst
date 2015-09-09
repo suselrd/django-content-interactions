@@ -9,6 +9,10 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 Changelog
 =========
 
+0.4.2
+-----
++ Fixed stats mixin.
+
 0.4.1
 -----
 + Renamed stats application, to be more specific.
