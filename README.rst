@@ -9,6 +9,11 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 Changelog
 =========
 
+0.4.3
+-----
++ Fixed stats model.
++ Added migrations for stats app.
+
 0.4.2
 -----
 + Fixed stats mixin.

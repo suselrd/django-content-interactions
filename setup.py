@@ -5,7 +5,7 @@ setup(
     url="http://github.com/suselrd/django-content-interactions/",
     author="Susel Ruiz Duran",
     author_email="suselrd@gmail.com",
-    version="0.4.2",
+    version="0.4.3",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
