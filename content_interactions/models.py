@@ -64,9 +64,6 @@ class Comment(BaseCommentAbstractModel):
     A user comment about some object.
     """
 
-    def default_level(self):
-        return self.answer_to.level + 1 if self.answer_to else 1
-
     # Who posted this comment? If ``user`` is set then it was an authenticated
     # user; otherwise at least user_name should have been set and the comment
     # was posted by a non-authenticated user.
@@ -84,7 +81,7 @@ class Comment(BaseCommentAbstractModel):
         'self', verbose_name=_(u'answer to'), related_name='answers', blank=True, null=True
     )
 
-    level = models.IntegerField(_(u'comment level'), blank=True, null=True, default=default_level, validators=[validate_level])
+    level = models.IntegerField(_(u'comment level'), blank=True, null=True, validators=[validate_level])
 
     # Metadata about the comment
     submit_date = models.DateTimeField(_(u'date/time submitted'), auto_now_add=True)
@@ -196,6 +193,8 @@ def fill_comment_user_data(instance, **kwargs):
     if not instance.user_name or not instance.user_email:
         instance.user_name = instance.user.get_full_name() or instance.user.username
         instance.user_email = instance.user.email
+    if not instance.level:
+        instance.level = instance.answer_to.level + 1 if instance.answer_to else 1
 
 
 @receiver(models.signals.post_save, sender=Comment, dispatch_uid="manage_comment_edges")

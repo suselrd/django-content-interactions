@@ -1,6 +1,6 @@
 # coding=utf-8
 from django.db.models.signals import post_syncdb
-from social_graph import EdgeType, EdgeTypeAssociation, models as social_graph_app
+from social_graph import EdgeType, EdgeTypeAssociation
 from . import (
     LIKE,
     LIKE_STR,
@@ -27,6 +27,8 @@ from . import (
     TARGETED_BY,
     TARGETED_BY_STR,
 )
+
+import models as content_interactions_app
 
 
 def create_edge_types(**kwargs):
@@ -84,4 +86,4 @@ def create_edge_types(**kwargs):
     EdgeTypeAssociation.objects.get_or_create(direct=target, inverse=targeted_by)
 
 
-post_syncdb.connect(create_edge_types, sender=social_graph_app)
+post_syncdb.connect(create_edge_types, sender=content_interactions_app)
