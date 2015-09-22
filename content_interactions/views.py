@@ -8,10 +8,12 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import View, FormView
-from forms import ShareForm, RateForm, DenounceForm
+from django.views.generic import View, FormView, CreateView, UpdateView, DeleteView
+from django.contrib.sites.models import Site
+from forms import ShareForm, RateForm, DenounceForm, CommentForm
 from signals import item_shared
 from utils import intmin
+from models import Comment
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +22,7 @@ MODAL_SHARE_SUCCESS_MESSAGE = _(u"The item has been successfully shared.")
 MODAL_RECOMMEND_SUCCESS_MESSAGE = _(u"The item has been successfully recommended.")
 MODAL_RATE_SUCCESS_MESSAGE = _(u"The item has been successfully rated.")
 MODAL_DENOUNCE_SUCCESS_MESSAGE = _(u"The item has been successfully denounced.")
+DELETE_COMMENT_SUCCESS_MESSAGE = _(u"The comment has been successfully deleted.")
 
 
 class JSONResponseMixin(object):
@@ -222,3 +225,59 @@ class DenounceView(FormView):
             'errorMsg': force_text(MODAL_VALIDATION_ERROR_MESSAGE)
         }
         return HttpResponseBadRequest(json.dumps(context), content_type='application/json')
+
+
+class CommentViewMixin(object):
+    model = Comment
+    form_class = CommentForm
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.template_name = "content_interactions/comment_detail.html"
+        return self.render_to_response({'comment': self.object})
+
+    def form_invalid(self, form):
+        context = {
+            'errorMsg': force_text(MODAL_VALIDATION_ERROR_MESSAGE)
+        }
+        return HttpResponseBadRequest(json.dumps(context), content_type='application/json')
+
+
+class CommentCreateView(CommentViewMixin, CreateView):
+    template_name = "content_interactions/comment_create.html"
+
+    def get_initial(self):
+        initial = super(CommentCreateView, self).get_initial()
+        initial.update({
+            'content_type': ContentType.objects.get(pk=self.kwargs.get('content_type_pk')),
+            'object_pk': self.kwargs.get('object_pk'),
+            'site': Site.objects.get_current(),
+        })
+        if self.request.user.is_authenticated:
+            initial.update({'user': self.request.user})
+        comment_pk = self.kwargs.get('comment_pk', False)
+        if comment_pk:
+            initial.update({'answer_to': Comment.objects.get(pk=comment_pk)})
+        return initial
+
+
+class CommentUpdateView(CommentViewMixin,UpdateView):
+    template_name = "content_interactions/comment_edit.html"
+
+
+class CommentDeleteView(DeleteView):
+    model = Comment
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
+        self.object = self.get_object()
+        self.object.delete()
+        context = {
+            'successMsg': force_text(DELETE_COMMENT_SUCCESS_MESSAGE),
+            'result': True,
+        }
+        return HttpResponse(json.dumps(context), content_type='application/json')
+

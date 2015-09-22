@@ -1,8 +1,15 @@
 # coding=utf-8
+import time
+
+from django.conf import settings
 from django import forms
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.forms.util import ErrorList
+from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.utils.crypto import salted_hmac, constant_time_compare
+from django.forms.util import ErrorList, ErrorDict
+from django.utils.translation import ugettext_lazy as _, ungettext, ugettext
+from django.utils.text import get_text_list
+from models import Comment
 
 
 class ShareForm(forms.Form):
@@ -74,4 +81,148 @@ class DenounceForm(forms.Form):
         else:
             self.obj.remove_denounce(self.user)
             return False
+
+
+DEFAULT_COMMENTS_TIMEOUT = getattr(settings, 'COMMENTS_TIMEOUT', (2 * 60 * 60))
+
+
+class CommentForm(forms.ModelForm):
+    timestamp = forms.IntegerField(widget=forms.HiddenInput)
+    security_hash = forms.CharField(min_length=40, max_length=40, widget=forms.HiddenInput)
+    honeypot = forms.CharField(
+        required=False,
+        label=_('If you enter anything in this field your comment will be treated as spam')
+    )
+
+    class Meta(object):
+        model = Comment
+        fields = ('content_type', 'object_pk', 'site', 'user', 'user_name', 'user_email', 'comment', 'answer_to')
+        widgets = {
+            'content_type': forms.HiddenInput(),
+            'object_pk': forms.HiddenInput(),
+            'site': forms.HiddenInput(),
+            'user': forms.HiddenInput(),
+            'answer_to': forms.HiddenInput(),
+        }
+
+    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
+                 label_suffix=None, empty_permitted=False, instance=None):
+        if initial is None:
+            initial = {}
+        initial.update(self._generate_security_data(initial))
+        super(CommentForm, self).__init__(data, files, auto_id, prefix, initial, error_class, label_suffix,
+                                          empty_permitted, instance)
+
+    def _initial_validate(self, initial):
+        if not 'content_type' in initial:
+            raise ImproperlyConfigured(
+                'Expect "content_type" within initial to initialize content_interactions.forms.CommentForm.'
+            )
+
+        if not 'object_pk' in initial:
+            raise ImproperlyConfigured(
+                'Expect "object_pk" within initial to initialize content_interactions.forms.CommentForm.'
+            )
+
+    def _generate_security_data(self, initial):
+        """Generate a dict of security data for "initial" data."""
+        content_type = str(initial.get('content_type'))
+        object_pk = str(initial.get('object_pk'))
+        timestamp = str(int(time.time()))
+
+        security_dict = {
+            'content_type': content_type,
+            'timestamp': timestamp,
+            'security_hash': self._generate_security_hash(content_type, object_pk, timestamp)
+        }
+        return security_dict
+
+    def _generate_security_hash(self, content_type, object_pk, timestamp):
+        """
+        Generate a HMAC security hash from the provided info.
+        """
+        return salted_hmac(
+            key_salt="content_interactions.forms.CommentForm",
+            value="-".join([content_type, object_pk, timestamp])
+        ).hexdigest()
+
+    def clean_comment(self):
+        """
+        If COMMENTS_ALLOW_PROFANITIES is False, check that the comment doesn't
+        contain anything in PROFANITIES_LIST.
+        """
+        comment = self.cleaned_data["comment"]
+        if (not getattr(settings, 'COMMENTS_ALLOW_PROFANITIES', False) and
+                getattr(settings, 'PROFANITIES_LIST', False)):
+            bad_words = [w for w in settings.PROFANITIES_LIST if w in comment.lower()]
+            if bad_words:
+                raise forms.ValidationError(ungettext(
+                    "Watch your mouth! The word %s is not allowed here.",
+                    "Watch your mouth! The words %s are not allowed here.",
+                    len(bad_words)) % get_text_list(
+                    ['"%s%s%s"' % (i[0], '-' * (len(i) - 2), i[-1])
+                     for i in bad_words], ugettext('and')))
+        return comment
+
+    def clean_security_hash(self):
+        """Check the security hash."""
+        security_hash_dict = {
+            'content_type': self.data.get("content_type", ""),
+            'object_pk': self.data.get("object_pk", ""),
+            'timestamp': self.data.get("timestamp", ""),
+        }
+        expected_hash = self.generate_security_hash(**security_hash_dict)
+        actual_hash = self.cleaned_data["security_hash"]
+        if not constant_time_compare(expected_hash, actual_hash):
+            raise forms.ValidationError(_(u"Security hash check failed."))
+        return actual_hash
+
+    def clean_timestamp(self):
+        """Make sure the timestamp isn't too far (default is > 2 hours) in the past."""
+        timestamp = self.cleaned_data["timestamp"]
+        if time.time() - timestamp > DEFAULT_COMMENTS_TIMEOUT:
+            raise forms.ValidationError(_(u"Timestamp check failed"))
+        return timestamp
+
+    def clean_honeypot(self):
+        """Check that nothing's been entered into the honeypot."""
+        value = self.cleaned_data["honeypot"]
+        if value:
+            raise forms.ValidationError(self.fields["honeypot"].label)
+        return value
+
+    def clean_user_name(self):
+        value = self.cleaned_data['user_name']
+        if not value and not self.cleaned_data['user']:
+            raise forms.ValidationError(_(u"This field is required."))
+
+    def clean_user_email(self):
+        value = self.cleaned_data['user_email']
+        if not value and not self.cleaned_data['user']:
+            raise forms.ValidationError(_(u"This field is required."))
+
+    def save(self, commit=True):
+        comment = super(CommentForm, self).save(commit=False)
+        comment = self._check_for_duplicate_comment(comment)
+        if commit:
+            comment.save()
+            self.save_m2m()
+        return comment
+
+    def _check_for_duplicate_comment(self, new):
+        """
+        Check that a submitted comment isn't a duplicate. This might be caused
+        by someone posting a comment twice. If it is a dup, silently return the *previous* comment.
+        """
+        possible_duplicates = self._meta.model.on_site.filter(
+            content_type=new.content_type,
+            object_pk=new.object_pk,
+            user_name=new.user_name,
+            user_email=new.user_email,
+            user_url=new.user_url,
+        )
+        for old in possible_duplicates:
+            if old.submit_date.date() == new.submit_date.date() and old.comment == new.comment:
+                return old
+        return new
 

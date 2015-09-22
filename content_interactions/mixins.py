@@ -4,7 +4,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.contrib.sites.models import Site
 from social_graph import Graph, EdgeType, ATTRIBUTES
-from . import LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY
+from . import (
+    LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY,
+    AUTHOR, AUTHORED_BY, TARGET, TARGETED_BY
+)
 from signals import (
     item_liked,
     item_disliked,
@@ -113,6 +116,54 @@ def denounced_by_edge():
         denounced_by = EdgeType.objects.get(name=DENOUNCED_BY)
         cache.set('DENOUNCED_BY_EDGE_TYPE', denounced_by)
         return denounced_by
+    except EdgeType.DoesNotExist as e:
+        logger.exception(e)
+
+
+def author_edge():
+    author = cache.get('AUTHOR_EDGE_TYPE')
+    if author is not None:
+        return author
+    try:
+        author = EdgeType.objects.get(name=AUTHOR)
+        cache.set('AUTHOR_EDGE_TYPE', author)
+        return author
+    except EdgeType.DoesNotExist as e:
+        logger.exception(e)
+
+
+def authored_by_edge():
+    authored_by = cache.get('AUTHORED_BY_EDGE_TYPE')
+    if authored_by is not None:
+        return authored_by
+    try:
+        authored_by = EdgeType.objects.get(name=AUTHORED_BY)
+        cache.set('AUTHORED_BY_EDGE_TYPE', authored_by)
+        return authored_by
+    except EdgeType.DoesNotExist as e:
+        logger.exception(e)
+
+
+def target_edge():
+    target = cache.get('TARGET_EDGE_TYPE')
+    if target is not None:
+        return target
+    try:
+        target = EdgeType.objects.get(name=TARGET)
+        cache.set('TARGET_EDGE_TYPE', target)
+        return target
+    except EdgeType.DoesNotExist as e:
+        logger.exception(e)
+
+
+def targeted_by_edge():
+    targeted_by = cache.get('TARGETED_BY_EDGE_TYPE')
+    if targeted_by is not None:
+        return targeted_by
+    try:
+        targeted_by = EdgeType.objects.get(name=TARGETED_BY)
+        cache.set('TARGETED_BY_EDGE_TYPE', targeted_by)
+        return targeted_by
     except EdgeType.DoesNotExist as e:
         logger.exception(e)
 
@@ -243,6 +294,24 @@ class DenounceTargetMixin(ContentInteractionMixin):
         if _deleted:
             item_denounce_removed.send(sender=self.__class__, instance=self, user=user)
         return _deleted
+
+
+class CommentTargetMixin(ContentInteractionMixin):
+
+    def get_comments_manager(self, *args, **kwargs):
+        if hasattr(self, 'owner'):
+            return (
+                self.owner if not callable(self.owner)
+                else self.owner(*args, **kwargs)
+            )
+        elif hasattr(self, 'get_owner'):
+            return (
+                self.get_owner if not callable(self.get_owner)
+                else self.get_owner(*args, **kwargs)
+            )
+        else:
+            return None
+
 
 
 class LikableManagerMixin(object):

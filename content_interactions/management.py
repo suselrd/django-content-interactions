@@ -17,7 +17,15 @@ from . import (
     DENOUNCE,
     DENOUNCE_STR,
     DENOUNCED_BY,
-    DENOUNCED_BY_STR
+    DENOUNCED_BY_STR,
+    AUTHOR,
+    AUTHOR_STR,
+    AUTHORED_BY,
+    AUTHORED_BY_STR,
+    TARGET,
+    TARGET_STR,
+    TARGETED_BY,
+    TARGETED_BY_STR,
 )
 
 
@@ -57,6 +65,23 @@ def create_edge_types(**kwargs):
         'read_as': DENOUNCED_BY_STR
     })
     EdgeTypeAssociation.objects.get_or_create(direct=denounce, inverse=denounced_by)
+
+    # Comment edges
+    author, created = EdgeType.objects.get_or_create(name=AUTHOR, defaults={
+        'read_as': AUTHOR_STR
+    })
+    authored_by, created = EdgeType.objects.get_or_create(name=AUTHORED_BY, defaults={
+        'read_as': AUTHORED_BY_STR
+    })
+    EdgeTypeAssociation.objects.get_or_create(direct=author, inverse=authored_by)
+
+    target, created = EdgeType.objects.get_or_create(name=TARGET, defaults={
+        'read_as': TARGET_STR
+    })
+    targeted_by, created = EdgeType.objects.get_or_create(name=TARGETED_BY, defaults={
+        'read_as': TARGETED_BY_STR
+    })
+    EdgeTypeAssociation.objects.get_or_create(direct=target, inverse=targeted_by)
 
 
 post_syncdb.connect(create_edge_types, sender=social_graph_app)

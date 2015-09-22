@@ -1,4 +1,5 @@
 # coding=utf-8
+from settings import *
 
 # NAMES
 LIKE = 'Like'
@@ -9,6 +10,10 @@ FAVORITE = 'Favorite'
 FAVORITE_OF = 'Favorite Of'
 DENOUNCE = 'Denounce'
 DENOUNCED_BY = 'Denounced By'
+AUTHOR = 'Author'
+AUTHORED_BY = 'Authored By'
+TARGET = 'Target'
+TARGETED_BY = 'Targeted By'
 
 # 'READ AS' STRINGS
 LIKE_STR = 'likes'
@@ -19,3 +24,7 @@ FAVORITE_STR = 'has as favorite'
 FAVORITE_OF_STR = 'is favorite of'
 DENOUNCE_STR = 'denounces'
 DENOUNCED_BY_STR = 'is denounced by'
+AUTHOR_STR = 'authored'
+AUTHORED_BY_STR = 'was authored by'
+TARGET_STR = 'targets'
+TARGETED_BY_STR = 'is targeted by'
