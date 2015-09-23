@@ -11,25 +11,37 @@ class CommentQuerySet(models.query.QuerySet):
     def active(self):
         return self.filter(is_removed=False)
 
-
-class CommentManager(models.Manager):
-
-    def get_queryset(self):
-        return CommentQuerySet(self.model, using=self._db).active()
+    def first_level(self):
+        return self.filter(answer_to=None)
 
     def for_model(self, model):
         """
         QuerySet for all comments for a particular model (either an instance or
         a class).
         """
-        ct = ContentType.objects.get_for_model(model)
-        qs = self.get_queryset().filter(content_type=ct)
+        content_type = ContentType.objects.get_for_model(model)
+        result = self.filter(content_type=content_type)
         if isinstance(model, models.Model):
-            qs = qs.filter(object_pk=force_text(model._get_pk_val()))
-        return qs
+            result = result.filter(object_pk=force_text(model._get_pk_val()))
+        return result
 
 
-class CommentCurrentSiteManager(CurrentSiteManager):
+class CommentManagerMixin(object):
+
+    def for_model(self, model):
+        return self.get_queryset().for_model(model)
+
+    def first_level(self):
+        return self.get_queryset().first_level()
+
+
+class CommentManager(CommentManagerMixin, models.Manager):
+
+    def get_queryset(self):
+        return CommentQuerySet(self.model, using=self._db).active()
+
+
+class CommentCurrentSiteManager(CommentManagerMixin, CurrentSiteManager):
 
     def get_queryset(self):
         if not self._CurrentSiteManager__is_validated:

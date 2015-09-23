@@ -1,0 +1,25 @@
+{% load i18n %}
+
+<form action="{% url "comment_answer" content_type_pk=form.initial.content_type.pk object_pk=form.initial.object_pk comment_pk=form.initial.answer_to.pk %}" method="post">
+    {% csrf_token %}
+
+    {{ form.honeypot }}
+    {{ form.content_type }}
+    {{ form.object_pk }}
+    {{ form.timestamp }}
+    {{ form.site }}
+    {{ form.security_hash }}
+    {{ form.answer_to }}
+
+    {% if not user.is_authenticated %}
+        {{ form.user_name }}
+        {{ form.user_email }}
+    {% else %}
+        {{ form.user }}
+    {% endif %}
+
+    {{ form.comment }}
+    <div>
+        <a href="javascript:void(0);" class="answer_comment">{% trans "Send" %}</a>
+    </div>
+</form>

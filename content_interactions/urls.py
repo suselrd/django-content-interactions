@@ -55,6 +55,12 @@ urlpatterns = patterns('',
     ),
 
     url(
+        r'^comment/(?P<content_type_pk>\d+)/(?P<object_pk>\d+)/list/$',
+        views.CommentListView.as_view(),
+        name="comment_list"
+    ),
+
+    url(
         r'^comment/(?P<pk>\d+)/edit/$',
         login_required(views.CommentUpdateView.as_view()),
         name="comment_edit"

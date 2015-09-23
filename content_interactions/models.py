@@ -69,9 +69,9 @@ class Comment(BaseCommentAbstractModel):
     # was posted by a non-authenticated user.
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_(u'user'),
                              blank=True, null=True, related_name="%(class)s_comments")
-    user_name = models.CharField(_(u"user's name"), max_length=50, blank=True)
+    user_name = models.CharField(_(u"name"), max_length=50, blank=True)
     # Explicit `max_length` to apply both to Django 1.7 and 1.8+.
-    user_email = models.EmailField(_(u"user's email address"), max_length=254,
+    user_email = models.EmailField(_(u"email"), max_length=254,
                                    blank=True)
     user_url = models.URLField(_(u"user's URL"), blank=True)
 
@@ -184,6 +184,8 @@ class Comment(BaseCommentAbstractModel):
         return _(u'Posted by %(user)s at %(date)s\n\n%(comment)s\n\nhttp://%(domain)s%(url)s') % data
 
     def delete(self, using=None):
+        for answer in self.answers.all():
+            answer.delete()
         self.is_removed = True
         self.save()
 

@@ -1,6 +1,7 @@
 # coding=utf-8
 import json
 import logging
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -8,7 +9,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_by_path
 from django.utils.translation import ugettext_lazy as _
-from django.views.generic import View, FormView, CreateView, UpdateView, DeleteView
+from django.views.generic import View, FormView, CreateView, UpdateView, DeleteView, ListView
 from django.contrib.sites.models import Site
 from forms import ShareForm, RateForm, DenounceForm, CommentForm
 from signals import item_shared
@@ -231,10 +232,35 @@ class CommentViewMixin(object):
     model = Comment
     form_class = CommentForm
 
+    def _get_model_str(self):
+        raise ImproperlyConfigured('You must implement "_get_model_str" method.')
+
+    def get_template_names(self):
+        names = []
+        names.append(
+            "%s/%s/%s%s.html" % (
+                self.model._meta.app_label,
+                self._get_model_str(),
+                self.model._meta.model_name,
+                self.template_name_suffix
+            )
+        )
+        names.append(
+            "%s/%s%s.html" % (
+                self.model._meta.app_label,
+                self.model._meta.model_name,
+                self.template_name_suffix
+            )
+        )
+        return names
+
     def form_valid(self, form):
         self.object = form.save()
-        self.template_name = "content_interactions/comment_detail.html"
-        return self.render_to_response({'comment': self.object})
+        self.template_name_suffix = "_detail"
+        return self.render_to_response({
+            'comment': self.object,
+            'user': self.request.user
+        })
 
     def form_invalid(self, form):
         context = {
@@ -244,12 +270,15 @@ class CommentViewMixin(object):
 
 
 class CommentCreateView(CommentViewMixin, CreateView):
-    template_name = "content_interactions/comment_create.html"
+
+    def get(self, request, *args, **kwargs):
+        self.template_name_suffix = "_create" if not "comment_pk" in kwargs else "_answer"
+        return super(CommentCreateView, self).get(request, *args, **kwargs)
 
     def get_initial(self):
         initial = super(CommentCreateView, self).get_initial()
         initial.update({
-            'content_type': ContentType.objects.get(pk=self.kwargs.get('content_type_pk')),
+            'content_type': ContentType.objects.get_for_id(self.kwargs.get('content_type_pk')),
             'object_pk': self.kwargs.get('object_pk'),
             'site': Site.objects.get_current(),
         })
@@ -260,13 +289,57 @@ class CommentCreateView(CommentViewMixin, CreateView):
             initial.update({'answer_to': Comment.objects.get(pk=comment_pk)})
         return initial
 
+    def _get_model_str(self):
+        return ContentType.objects.get_for_id(self.kwargs.get('content_type_pk')).model
+
 
 class CommentUpdateView(CommentViewMixin,UpdateView):
-    template_name = "content_interactions/comment_edit.html"
+    template_name_suffix = "_edit"
+
+    def get_object(self, queryset=None):
+        obj = super(CommentUpdateView, self).get_object(queryset)
+        if self.request.user != obj.user:
+            raise ImproperlyConfigured(_(u"The comment must be edited by the user creator."))
+        return obj
+
+    def _get_model_str(self):
+        return self.get_object().content_object._meta.model_name
+
+
+class CommentListView(ListView):
+    model = Comment
+    context_object_name = 'comments'
+    content_object = None
+
+    def get_queryset(self):
+        content_type = ContentType.objects.get_for_id(self.kwargs.get('content_type_pk'))
+        self.content_object = content_type.get_object_for_this_type(pk=self.kwargs.get('object_pk'))
+        return self.model.on_site.for_model(self.content_object).first_level()
+
+    def get_template_names(self):
+        names = super(CommentListView, self).get_template_names()
+        names.insert(
+            0,
+            "%s/%s/%s%s.html" % (
+                self.model._meta.app_label,
+                self.content_object._meta.model_name,
+                self.model._meta.model_name,
+                self.template_name_suffix
+            )
+        )
+        return names
 
 
 class CommentDeleteView(DeleteView):
     model = Comment
+
+    def get_object(self, queryset=None):
+        obj = super(CommentDeleteView, self).get_object(queryset)
+        if self.request.user != obj.content_object.get_comments_manager() and self.request.user != obj.user:
+            raise ImproperlyConfigured(
+                _(u"The comment must be deleted by the user creator or user content_type manager.")
+            )
+        return obj
 
     def delete(self, request, *args, **kwargs):
         """
@@ -274,10 +347,11 @@ class CommentDeleteView(DeleteView):
         redirects to the success URL.
         """
         self.object = self.get_object()
-        self.object.delete()
         context = {
             'successMsg': force_text(DELETE_COMMENT_SUCCESS_MESSAGE),
             'result': True,
+            'pk': self.object.pk,
         }
+        self.object.delete()
         return HttpResponse(json.dumps(context), content_type='application/json')
 

@@ -1,0 +1,29 @@
+{% load i18n humanize %}
+{% load content_interaction_tags %}
+
+<div id="comment_{{ comment.pk }}" class="comment_item" {% if comment.answer_to %}data-parent="comment_{{ comment.answer_to.pk }}"{% endif %}>
+    <p>
+        {{ comment.user_name }} (<strong>{{ comment.user_email }}</strong>) {{ comment.submit_date|naturaltime }} <br>
+        {{ comment.comment }}
+    </p>
+    <div>
+        {% can_edit_comment comment user as can_edit %}
+        {% can_delete_comment comment user as can_delete %}
+        {% can_answer_comment comment user as can_answer %}
+
+        {% if can_edit %}
+            <a href="{% url "comment_edit" pk=comment.pk %}" class="edit_comment">{% trans "Editar" %}</a>
+        {% endif %}
+
+        {% if can_delete %}
+            <a href="{% url "comment_delete" pk=comment.pk %}" class="delete_comment">{% trans "Eliminar" %}</a>
+        {% endif %}
+
+        {% if can_answer %}
+            <a href="{% url "comment_answer" content_type_pk=comment.content_type.pk object_pk=comment.object_pk comment_pk=comment.pk %}" class="answer_comment">
+                {% trans "Responder" %}
+            </a>
+        {% endif %}
+    </div>
+    <br>
+</div>

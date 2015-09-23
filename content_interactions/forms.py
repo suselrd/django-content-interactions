@@ -1,4 +1,3 @@
-# coding=utf-8
 import time
 
 from django.conf import settings
@@ -107,9 +106,9 @@ class CommentForm(forms.ModelForm):
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
                  label_suffix=None, empty_permitted=False, instance=None):
-        if initial is None:
-            initial = {}
-        initial.update(self._generate_security_data(initial))
+        if not instance:
+            self._initial_validate(initial)
+        initial.update(self._generate_security_data(instance or initial))
         super(CommentForm, self).__init__(data, files, auto_id, prefix, initial, error_class, label_suffix,
                                           empty_permitted, instance)
 
@@ -124,14 +123,13 @@ class CommentForm(forms.ModelForm):
                 'Expect "object_pk" within initial to initialize content_interactions.forms.CommentForm.'
             )
 
-    def _generate_security_data(self, initial):
+    def _generate_security_data(self, content):
         """Generate a dict of security data for "initial" data."""
-        content_type = str(initial.get('content_type'))
-        object_pk = str(initial.get('object_pk'))
+        content_type = str(content.content_type.pk if isinstance(content, Comment) else content.get('content_type').pk)
+        object_pk = str(content.object_pk if isinstance(content, Comment) else content.get('object_pk'))
         timestamp = str(int(time.time()))
 
         security_dict = {
-            'content_type': content_type,
             'timestamp': timestamp,
             'security_hash': self._generate_security_hash(content_type, object_pk, timestamp)
         }
@@ -171,7 +169,7 @@ class CommentForm(forms.ModelForm):
             'object_pk': self.data.get("object_pk", ""),
             'timestamp': self.data.get("timestamp", ""),
         }
-        expected_hash = self.generate_security_hash(**security_hash_dict)
+        expected_hash = self._generate_security_hash(**security_hash_dict)
         actual_hash = self.cleaned_data["security_hash"]
         if not constant_time_compare(expected_hash, actual_hash):
             raise forms.ValidationError(_(u"Security hash check failed."))
@@ -195,34 +193,10 @@ class CommentForm(forms.ModelForm):
         value = self.cleaned_data['user_name']
         if not value and not self.cleaned_data['user']:
             raise forms.ValidationError(_(u"This field is required."))
+        return value
 
     def clean_user_email(self):
         value = self.cleaned_data['user_email']
         if not value and not self.cleaned_data['user']:
             raise forms.ValidationError(_(u"This field is required."))
-
-    def save(self, commit=True):
-        comment = super(CommentForm, self).save(commit=False)
-        comment = self._check_for_duplicate_comment(comment)
-        if commit:
-            comment.save()
-            self.save_m2m()
-        return comment
-
-    def _check_for_duplicate_comment(self, new):
-        """
-        Check that a submitted comment isn't a duplicate. This might be caused
-        by someone posting a comment twice. If it is a dup, silently return the *previous* comment.
-        """
-        possible_duplicates = self._meta.model.on_site.filter(
-            content_type=new.content_type,
-            object_pk=new.object_pk,
-            user_name=new.user_name,
-            user_email=new.user_email,
-            user_url=new.user_url,
-        )
-        for old in possible_duplicates:
-            if old.submit_date.date() == new.submit_date.date() and old.comment == new.comment:
-                return old
-        return new
-
+        return value

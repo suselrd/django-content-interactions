@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<p>
+    {% with comment_count=comments|length %}
+        {% blocktrans with count=comment_count %}<span id="comment_count">{{ count }}</span> comments have been posted.{% endblocktrans %}&nbsp;
+        {% if comment_count == 0 %}{% trans "Be the first to post a comment." %}{% endif %}
+    {% endwith %}
+</p>
+
+<div id="comment_list">
+    {% for comment in comments %}
+        {% include "content_interactions/comment_detail.html" with comment=comment user=user only %}
+        <div id="answers_comment_{{ comment.pk }}" style="padding-left: 15px;">
+            {% for nested_comment in comment.answers.all %}
+                {% include "content_interactions/comment_detail.html" with comment=nested_comment user=user only %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

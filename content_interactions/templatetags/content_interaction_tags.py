@@ -1,6 +1,8 @@
 # coding=utf-8
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django import template
+from ..models import Comment
 from ..mixins import LikableMixin, FavoriteListItemMixin, RateableMixin, DenounceTargetMixin
 from ..utils import intmin as intmin_function
 
@@ -83,3 +85,36 @@ def intmin(value):
     """
     """
     return intmin_function(value)
+
+
+@register.assignment_tag
+def can_edit_comment(comment, user):
+    if not isinstance(comment, Comment):
+        raise Exception("Comment instance expected")
+
+    if not comment.user:
+        return False
+
+    if not user or user.is_anonymous():
+        return False
+
+    return comment.user == user
+
+
+@register.assignment_tag
+def can_delete_comment(comment, user):
+    if not isinstance(comment, Comment):
+        raise Exception("Comment instance expected")
+
+    if not user or user.is_anonymous():
+        return False
+
+    return comment.content_object.get_comments_manager() == user or comment.user == user
+
+
+@register.assignment_tag
+def can_answer_comment(comment, user):
+    if not isinstance(comment, Comment):
+        raise Exception("Comment instance expected")
+
+    return comment.level <= settings.COMMENT_MAX_LEVELS
