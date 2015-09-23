@@ -56,6 +56,18 @@ def item_denounce_removed_process(item_id, item_content_type):
     item_denounce_removed_process(item_id, item_content_type)
 
 
+@shared_task(name='content_interactions.comment_process')
+def item_got_comment_process(item_id, item_content_type):
+    from content_interactions_stats.utils import item_got_comment_process
+    item_got_comment_process(item_id, item_content_type)
+
+
+@shared_task(name='content_interactions.comment_deleted_process')
+def item_comment_deleted_process(item_id, item_content_type):
+    from content_interactions_stats.utils import item_comment_deleted_process
+    item_comment_deleted_process(item_id, item_content_type)
+
+
 @shared_task(name='content_interactions.visit_process')
 def item_visited_process(item_id, item_content_type):
     from content_interactions_stats.utils import item_visited_process

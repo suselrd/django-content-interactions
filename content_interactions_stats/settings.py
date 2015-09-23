@@ -7,6 +7,7 @@ CONTENT_INTERACTIONS_STATS_PROCESSORS = getattr(settings, 'CONTENT_INTERACTIONS_
     'content_interactions_stats.processors.Shares',
     'content_interactions_stats.processors.Denounces',
     'content_interactions_stats.processors.Ratings',
+    'content_interactions_stats.processors.Comments',
     'content_interactions_stats.processors.Visits',
 ))
 
@@ -27,6 +28,9 @@ CONTENT_INTERACTIONS_DENOUNCE_PROCESSING_DELAY = getattr(
 )
 CONTENT_INTERACTIONS_SHARE_PROCESSING_DELAY = getattr(
     settings, 'CONTENT_INTERACTIONS_SHARE_PROCESSING_DELAY', CONTENT_INTERACTIONS_STATS_PROCESSING_DELAY
+)
+CONTENT_INTERACTIONS_COMMENT_PROCESSING_DELAY = getattr(
+    settings, 'CONTENT_INTERACTIONS_COMMENT_PROCESSING_DELAY', CONTENT_INTERACTIONS_STATS_PROCESSING_DELAY
 )
 CONTENT_INTERACTIONS_VISIT_PROCESSING_DELAY = getattr(
     settings, 'CONTENT_INTERACTIONS_VISIT_PROCESSING_DELAY', CONTENT_INTERACTIONS_STATS_PROCESSING_DELAY

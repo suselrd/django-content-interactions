@@ -9,6 +9,10 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 Changelog
 =========
 
+0.6.0
+-----
++ Added support for comment stats.
+
 0.5.0
 -----
 + Added support for content commenting.

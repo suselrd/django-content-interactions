@@ -12,7 +12,9 @@ from content_interactions.signals import (
     item_unmarked_as_favorite,
     item_shared,
     item_denounced,
-    item_denounce_removed
+    item_denounce_removed,
+    item_commented,
+    item_comment_removed
 )
 from handlers import (
     like_handler,
@@ -25,6 +27,8 @@ from handlers import (
     share_handler,
     denounce_handler,
     denounce_remove_handler,
+    comment_handler,
+    comment_deleted_handler,
     visit_handler
 )
 
@@ -114,6 +118,16 @@ class Denounces(BaseProcessor):
     handlers = (
         ('item_denounced', item_denounced, denounce_handler),
         ('item_denounce_removed', item_denounce_removed, denounce_remove_handler),
+    )
+
+
+class Comments(BaseProcessor):
+    fields = (
+        ('comments', models.IntegerField(default=0, verbose_name=_('comments'))),
+    )
+    handlers = (
+        ('item_commented', item_commented, comment_handler),
+        ('item_comment_removed', item_comment_removed, comment_deleted_handler),
     )
 
 

@@ -118,3 +118,18 @@ def item_denounce_removed_process(item_id, item_content_type):
     stats_obj, created = Stats.objects.get_or_create(object_pk=item_id, content_type=item_content_type)
     stats_obj.denounces = F('denounces')-1
     stats_obj.save()
+
+
+def item_got_comment_process(item_id, item_content_type):
+    from models import Stats
+    stats_obj, created = Stats.objects.get_or_create(object_pk=item_id, content_type=item_content_type)
+    stats_obj.comments = F('comments')+1
+    stats_obj.save()
+
+
+def item_comment_deleted_process(item_id, item_content_type):
+    from models import Stats
+    stats_obj, created = Stats.objects.get_or_create(object_pk=item_id, content_type=item_content_type)
+    if not created:
+        stats_obj.comments = F('comments')-1
+        stats_obj.save()

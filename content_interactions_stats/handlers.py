@@ -6,7 +6,8 @@ from settings import (
     CONTENT_INTERACTIONS_FAVORITE_PROCESSING_DELAY,
     CONTENT_INTERACTIONS_DENOUNCE_PROCESSING_DELAY,
     CONTENT_INTERACTIONS_SHARE_PROCESSING_DELAY,
-    CONTENT_INTERACTIONS_VISIT_PROCESSING_DELAY
+    CONTENT_INTERACTIONS_COMMENT_PROCESSING_DELAY,
+    CONTENT_INTERACTIONS_VISIT_PROCESSING_DELAY,
 )
 
 
@@ -139,6 +140,34 @@ def share_handler(instance, **kwargs):
             pass
     from utils import item_shared_process as sync_item_shared_process
     sync_item_shared_process(instance.pk, ContentType.objects.get_for_model(instance))
+
+
+#noinspection PyUnresolvedReferences,PyUnusedLocal
+def comment_handler(instance, user, answer_to, **kwargs):
+    commented_item = instance.content_object
+    if CONTENT_INTERACTIONS_COMMENT_PROCESSING_DELAY:
+        try:
+            from tasks import item_got_comment_process
+            item_got_comment_process.delay(commented_item.pk, ContentType.objects.get_for_model(commented_item))
+            return
+        except ImportError:
+            pass
+    from utils import item_got_comment_process as sync_item_got_comment_process
+    sync_item_got_comment_process(commented_item.pk, ContentType.objects.get_for_model(commented_item))
+
+
+#noinspection PyUnresolvedReferences,PyUnusedLocal
+def comment_deleted_handler(instance, **kwargs):
+    commented_item = instance.content_object
+    if CONTENT_INTERACTIONS_COMMENT_PROCESSING_DELAY:
+        try:
+            from tasks import item_comment_deleted_process
+            item_comment_deleted_process.delay(commented_item.pk, ContentType.objects.get_for_model(commented_item))
+            return
+        except ImportError:
+            pass
+    from utils import item_comment_deleted_process as sync_item_comment_deleted_process
+    sync_item_comment_deleted_process(commented_item.pk, ContentType.objects.get_for_model(commented_item))
 
 
 #noinspection PyUnresolvedReferences,PyUnusedLocal
