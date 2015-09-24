@@ -8,6 +8,9 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.6.1
+-----
++ Fix toggle interaction success implementation.
 
 0.6.0
 -----

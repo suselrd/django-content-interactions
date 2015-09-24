@@ -75,7 +75,7 @@ var ToggleInteraction = iClazz(Interaction, {
 
     success: function(response, status, xhr, context) {
         if (status == "success" && response['result']) {
-            $(context).addClass((response['toggle_status']) ? 'on' : 'off');
+            $(context).removeClass('on').removeClass('off').addClass((response['toggle_status']) ? 'on' : 'off');
         }
     },
 
