@@ -8,6 +8,10 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.6.2
+-----
++ Added missing migration.
+
 0.6.1
 -----
 + Fix toggle interaction success implementation.
