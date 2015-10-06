@@ -70,7 +70,7 @@ class DenounceForm(forms.Form):
             **{'pk': self.cleaned_data['object_pk']}
         )
         if not self.obj.denounced_by(self.user) and not self.cleaned_data.get('comment', None):
-            raise ValidationError('Denounce comment is mandatory.')
+            self._errors['comment'] = self.error_class(["This file is required."])
         return self.cleaned_data
 
     def save_denounce(self):

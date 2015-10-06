@@ -8,6 +8,10 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.6.3
+-----
++ Fixed denounce form error message.
+
 0.6.2
 -----
 + Added missing migration.
