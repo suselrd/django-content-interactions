@@ -8,6 +8,11 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.6.3
+-----
++ Added missing translations
++ Fixed denounce deleted success message
+
 0.6.2
 -----
 + Added missing migration.

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-content-interactions\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 13:12-0600\n"
+"POT-Creation-Date: 2015-11-25 11:07-0600\n"
 "PO-Revision-Date: 2014-11-27 00:23-0500\n"
 "Last-Translator: Susel Ruiz <suselrd@gmail.com>\n"
 "Language-Team: English\n"
@@ -15,6 +15,127 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: forms.py:93
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: forms.py:158
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: forms.py:162
+msgid "and"
+msgstr ""
+
+#: forms.py:175
+msgid "Security hash check failed."
+msgstr ""
+
+#: forms.py:182
+msgid "Timestamp check failed"
+msgstr ""
+
+#: forms.py:195 forms.py:201
+msgid "This field is required."
+msgstr ""
+
+#: models.py:35
+msgid "content type"
+msgstr ""
+
+#: models.py:37
+msgid "object ID"
+msgstr ""
+
+#: models.py:58
+msgid "Max comment level exceeded."
+msgstr ""
+
+#: models.py:70
+msgid "user"
+msgstr ""
+
+#: models.py:72
+msgid "name"
+msgstr ""
+
+#: models.py:74
+msgid "email"
+msgstr ""
+
+#: models.py:76
+msgid "user's URL"
+msgstr ""
+
+#: models.py:78 models.py:105
+msgid "comment"
+msgstr ""
+
+#: models.py:81
+msgid "answer to"
+msgstr ""
+
+#: models.py:84
+msgid "comment level"
+msgstr ""
+
+#: models.py:87
+msgid "date/time submitted"
+msgstr ""
+
+#: models.py:88
+msgid "IP address"
+msgstr ""
+
+#: models.py:89
+msgid "is public"
+msgstr ""
+
+#: models.py:90
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+
+#: models.py:92
+msgid "is removed"
+msgstr ""
+
+#: models.py:93
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+
+#: models.py:106
+msgid "comments"
+msgstr ""
+
+#: models.py:145
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+
+#: models.py:156
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+
+#: models.py:184
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
 
 #: utils.py:7
 #, python-format
@@ -31,46 +152,90 @@ msgstr ""
 msgid "%(value)dG"
 msgstr ""
 
-#: views.py:18
+#: views.py:21
 msgid "A validation error has occurred."
 msgstr ""
 
-#: views.py:19
+#: views.py:22
 msgid "The item has been successfully shared."
 msgstr ""
 
-#: views.py:20
+#: views.py:23
 msgid "The item has been successfully recommended."
 msgstr ""
 
-#: views.py:21
+#: views.py:24
 msgid "The item has been successfully rated."
 msgstr ""
 
-#: views.py:22
+#: views.py:25
 msgid "The item has been successfully denounced."
 msgstr ""
 
-#: views.py:63
+#: views.py:26
+msgid "The denounce has been successfully deleted."
+msgstr ""
+
+#: views.py:27
+msgid "The comment has been successfully deleted."
+msgstr ""
+
+#: views.py:65
 msgid "Like"
 msgstr ""
 
-#: views.py:67
+#: views.py:69
 msgid "Unlike"
 msgstr ""
 
-#: views.py:101
+#: views.py:103
 msgid "Mark as Favorite"
 msgstr ""
 
-#: views.py:105
+#: views.py:107
 msgid "Not my Favorite"
 msgstr ""
 
-#: views.py:251
+#: views.py:222
 msgid "Delete Denounce"
 msgstr ""
 
-#: views.py:251
+#: views.py:222
 msgid "Denounce"
+msgstr ""
+
+#: views.py:304
+msgid "The comment must be edited by the user creator."
+msgstr ""
+
+#: views.py:342
+msgid ""
+"The comment must be deleted by the user creator or user content_type manager."
+msgstr ""
+
+#: templates/content_interactions/comment_answer.html:23
+#: templates/content_interactions/comment_create.html:22
+#: templates/content_interactions/comment_edit.html:22
+msgid "Send"
+msgstr ""
+
+#: templates/content_interactions/comment_detail.html:15
+msgid "Edit"
+msgstr ""
+
+#: templates/content_interactions/comment_detail.html:19
+msgid "Delete"
+msgstr ""
+
+#: templates/content_interactions/comment_detail.html:24
+msgid "Reply"
+msgstr ""
+
+#: templates/content_interactions/comment_list.html:5
+#, python-format
+msgid "<span id=\"comment_count\">%(count)s</span> comments have been posted."
+msgstr ""
+
+#: templates/content_interactions/comment_list.html:6
+msgid "Be the first to post a comment."
 msgstr ""

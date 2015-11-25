@@ -23,6 +23,7 @@ MODAL_SHARE_SUCCESS_MESSAGE = _(u"The item has been successfully shared.")
 MODAL_RECOMMEND_SUCCESS_MESSAGE = _(u"The item has been successfully recommended.")
 MODAL_RATE_SUCCESS_MESSAGE = _(u"The item has been successfully rated.")
 MODAL_DENOUNCE_SUCCESS_MESSAGE = _(u"The item has been successfully denounced.")
+MODAL_DELETE_DENOUNCE_SUCCESS_MESSAGE = _(u"The denounce has been successfully deleted.")
 DELETE_COMMENT_SUCCESS_MESSAGE = _(u"The comment has been successfully deleted.")
 
 
@@ -212,7 +213,8 @@ class DenounceView(FormView):
         denounced = form.save_denounce()
         denounces = form.obj.denounces
         context = {
-            'successMsg': force_text(MODAL_DENOUNCE_SUCCESS_MESSAGE),
+            'successMsg': force_text(MODAL_DENOUNCE_SUCCESS_MESSAGE) if denounced
+            else force_text(MODAL_DELETE_DENOUNCE_SUCCESS_MESSAGE),
             'result': True,
             'toggle_status': denounced,
             'counter': denounces,

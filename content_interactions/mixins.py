@@ -313,7 +313,6 @@ class CommentTargetMixin(ContentInteractionMixin):
             return None
 
 
-
 class LikableManagerMixin(object):
     graph = graph
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-content-interactions\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 13:16-0600\n"
+"POT-Creation-Date: 2015-11-25 11:07-0600\n"
 "PO-Revision-Date: 2014-11-27 00:23-0500\n"
 "Last-Translator: Susel Ruiz <suselrd@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -16,6 +16,139 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: forms.py:93
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr ""
+
+#: forms.py:158
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] ""
+msgstr[1] ""
+
+#: forms.py:162
+msgid "and"
+msgstr "y"
+
+#: forms.py:175
+msgid "Security hash check failed."
+msgstr "El chequeo de seguridad ha fallado."
+
+#: forms.py:182
+msgid "Timestamp check failed"
+msgstr "El chequeo de marca de tiempo ha fallado."
+
+#: forms.py:195 forms.py:201
+msgid "This field is required."
+msgstr "Este campo es obligatorio."
+
+#: models.py:35
+msgid "content type"
+msgstr ""
+
+#: models.py:37
+msgid "object ID"
+msgstr ""
+
+#: models.py:58
+msgid "Max comment level exceeded."
+msgstr "Ha excedido el límite de anidación de comentarios."
+
+#: models.py:70
+msgid "user"
+msgstr "usuario"
+
+#: models.py:72
+msgid "name"
+msgstr "nombre"
+
+#: models.py:74
+msgid "email"
+msgstr ""
+
+#: models.py:76
+msgid "user's URL"
+msgstr "URL de usuario"
+
+#: models.py:78 models.py:105
+msgid "comment"
+msgstr "comentario"
+
+#: models.py:81
+msgid "answer to"
+msgstr "respuesta a"
+
+#: models.py:84
+msgid "comment level"
+msgstr "nivel de comentario"
+
+#: models.py:87
+msgid "date/time submitted"
+msgstr "fecha de publicación"
+
+#: models.py:88
+msgid "IP address"
+msgstr "dirección IP"
+
+#: models.py:89
+msgid "is public"
+msgstr "es público"
+
+#: models.py:90
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Desmarque esta casilla para eliminar completamente el comentario del sitio."
+
+#: models.py:92
+msgid "is removed"
+msgstr "eliminado"
+
+#: models.py:93
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Marque esta casilla si el comentario es inapropiado. Un mensaje de \"El comentario ha sido "
+"eliminado\" se mostrará en su lugar."
+
+#: models.py:106
+msgid "comments"
+msgstr "comentarios"
+
+#: models.py:145
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Este comentario fue publicado por un usuario autenticado, por lo que el nombre no "
+"puede modificarse."
+
+#: models.py:156
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Este comentario fue publicado por un usuario autenticado, por lo que el correo electrónico no "
+"puede modificarse."
+
+#: models.py:184
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Publicado por %(user)s el %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
 
 #: utils.py:7
 #, python-format
@@ -32,46 +165,91 @@ msgstr ""
 msgid "%(value)dG"
 msgstr ""
 
-#: views.py:18
+#: views.py:21
 msgid "A validation error has occurred."
 msgstr "Ha ocurrido un error de validación"
 
-#: views.py:19
+#: views.py:22
 msgid "The item has been successfully shared."
 msgstr "El elemento ha sido compartido satisfactoriamente."
 
-#: views.py:20
+#: views.py:23
 msgid "The item has been successfully recommended."
 msgstr "El elemento ha sido recomendado satisfactoriamente."
 
-#: views.py:21
+#: views.py:24
 msgid "The item has been successfully rated."
 msgstr "El elemento ha sido calificado satisfactoriamente."
 
-#: views.py:22
+#: views.py:25
 msgid "The item has been successfully denounced."
 msgstr "El elemento ha sido denunciado satisfactoriamente."
 
-#: views.py:63
+#: views.py:26
+msgid "The denounce has been successfully deleted."
+msgstr "La denuncia ha sido eliminada satisfactoriamente."
+
+#: views.py:27
+msgid "The comment has been successfully deleted."
+msgstr "El comentatio ha sido eliminado satisfactoriamente."
+
+#: views.py:65
 msgid "Like"
 msgstr "Me Gusta"
 
-#: views.py:67
+#: views.py:69
 msgid "Unlike"
 msgstr "No me Gusta"
 
-#: views.py:101
+#: views.py:103
 msgid "Mark as Favorite"
 msgstr "Marcar como Favorito"
 
-#: views.py:105
+#: views.py:107
 msgid "Not my Favorite"
 msgstr "Desmarcar como Favorito"
 
-#: views.py:251
+#: views.py:222
 msgid "Delete Denounce"
 msgstr "Eliminar Denuncia"
 
-#: views.py:251
+#: views.py:222
 msgid "Denounce"
 msgstr "Denunciar"
+
+#: views.py:304
+msgid "The comment must be edited by the user creator."
+msgstr "El comentario solo puede ser modificado por su autor."
+
+#: views.py:342
+msgid ""
+"The comment must be deleted by the user creator or user content_type manager."
+msgstr ""
+"El comentario solo puede ser eliminado por su autor o por el administrador del contenido asociado."
+
+#: templates/content_interactions/comment_answer.html:23
+#: templates/content_interactions/comment_create.html:22
+#: templates/content_interactions/comment_edit.html:22
+msgid "Send"
+msgstr "Enviar"
+
+#: templates/content_interactions/comment_detail.html:15
+msgid "Edit"
+msgstr "Editar"
+
+#: templates/content_interactions/comment_detail.html:19
+msgid "Delete"
+msgstr "Eliminar"
+
+#: templates/content_interactions/comment_detail.html:24
+msgid "Reply"
+msgstr "Responder"
+
+#: templates/content_interactions/comment_list.html:5
+#, python-format
+msgid "<span id=\"comment_count\">%(count)s</span> comments have been posted."
+msgstr "<span id=\"comment_count\">%(count)s</span> comentarios han sido publicados."
+
+#: templates/content_interactions/comment_list.html:6
+msgid "Be the first to post a comment."
+msgstr "Sea el primero en comentar."

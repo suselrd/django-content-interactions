@@ -45,3 +45,6 @@ USE_L10N = True
 
 
 ROOT_URLCONF = 'content_interactions.tests.urls'
+
+
+COMMENT_MAX_LENGTH = 3000

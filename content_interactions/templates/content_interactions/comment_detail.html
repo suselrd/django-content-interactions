@@ -12,16 +12,16 @@
         {% can_answer_comment comment user as can_answer %}
 
         {% if can_edit %}
-            <a href="{% url "comment_edit" pk=comment.pk %}" class="edit_comment">{% trans "Editar" %}</a>
+            <a href="{% url "comment_edit" pk=comment.pk %}" class="edit_comment">{% trans "Edit" %}</a>
         {% endif %}
 
         {% if can_delete %}
-            <a href="{% url "comment_delete" pk=comment.pk %}" class="delete_comment">{% trans "Eliminar" %}</a>
+            <a href="{% url "comment_delete" pk=comment.pk %}" class="delete_comment">{% trans "Delete" %}</a>
         {% endif %}
 
         {% if can_answer %}
             <a href="{% url "comment_answer" content_type_pk=comment.content_type.pk object_pk=comment.object_pk comment_pk=comment.pk %}" class="answer_comment">
-                {% trans "Responder" %}
+                {% trans "Reply" %}
             </a>
         {% endif %}
     </div>
