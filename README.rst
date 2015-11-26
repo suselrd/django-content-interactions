@@ -11,6 +11,7 @@ Changelog
 0.6.4
 -----
 + Added missing translations
++ Fixed denounce deleted success message.
 
 0.6.3
 -----

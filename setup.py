@@ -10,7 +10,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     description="Common user-content interactions for Django",
-    install_requires=['django=1.6.1', 'redis>=2.4.5', 'django-social-graph>=0.2.0'],
+    install_requires=['django>=1.6.1', 'redis>=2.4.5', 'django-social-graph>=0.2.0'],
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
