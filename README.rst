@@ -8,6 +8,10 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.6.5
+-----
++ Added monitoring functionality. Only visit activity monitoring by now.
+
 0.6.4
 -----
 + Added missing translations

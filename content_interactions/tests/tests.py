@@ -5,12 +5,14 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from social_graph import Graph
-from models import A
 
 
 class TestContentInteractions(TestCase):
 
     def setUp(self):
+
+        from models import A
+
         self.user = User.objects.create_user(username='user', password='pass')
         self.object, created = A.objects.get_or_create(name='a1')
         Graph().clear_cache()
@@ -144,3 +146,34 @@ class TestContentInteractions(TestCase):
 
     def test_stats_property(self):
         self.assertIsNotNone(self.object.stats)
+
+    def test_visits_monitoring(self):
+        c = Client()
+        logged_in = c.login(username='user', password='pass')
+        self.assertTrue(logged_in)
+
+        self.assertEqual(self.object.activity_records.count(), 0)
+
+        response = c.get(reverse('detail', kwargs={
+            'pk': self.object.pk
+        }))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('object', response.context_data)
+
+        self.assertEqual(self.object.activity_records.count(), 1)
+        self.assertEqual(self.object.activity_records.current().count(), 1)
+
+        current = self.object.activity_records.current()
+        users = [record.user for record in current]
+        self.assertIn(self.user, users)
+
+        response = c.get(reverse('activity'), data={
+            'model': 'content_interactions.tests.models.A', 'pk': self.object.pk
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('activity_records', response.context_data)
+        self.assertEqual(response.context_data['activity_records'].count(), 1)
+        self.assertEqual(response.context_data['activity_records'].first().user, self.user)
+
+    def test_activity_records_property(self):
+        self.assertIsNotNone(self.object.activity_records)

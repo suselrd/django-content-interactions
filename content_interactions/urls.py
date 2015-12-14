@@ -3,7 +3,8 @@ from django.conf.urls import patterns, url
 from django.contrib.auth.decorators import login_required
 import views
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(
         r'^like/$',
         login_required(views.LikeView.as_view()),
@@ -31,7 +32,7 @@ urlpatterns = patterns('',
     url(
         r'^commented_rate/$',
         login_required(views.RateView.as_view(
-            template_name = 'content_interactions/commented_rate.html'
+            template_name='content_interactions/commented_rate.html'
         )),
         name="commented_rate_item"
     ),

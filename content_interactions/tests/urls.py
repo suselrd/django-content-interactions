@@ -9,6 +9,7 @@ urlpatterns = patterns(
     url(r"(?P<pk>\d+)", DetailView.as_view(model=A),
         name="detail"),
     (r'^content_interactions/', include('content_interactions.urls')),
+    (r'^monitoring/', include('content_interactions_monitoring.urls')),
 
 )
 

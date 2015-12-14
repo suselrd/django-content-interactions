@@ -28,8 +28,9 @@ INSTALLED_APPS = [
     'south',
     'widget_tweaks',
     'social_graph',
-    'content_interactions',
     'content_interactions_stats',
+    'content_interactions_monitoring',
+    'content_interactions',
     'content_interactions.tests'
 ]
 
