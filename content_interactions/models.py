@@ -213,5 +213,5 @@ def create_comment_edges(instance, created, **kwargs):
         graph.no_edge(instance, instance.content_object, target_edge(), instance.site)
 
         item_comment_removed.send(
-            sender=Comment, instance=instance, user=instance.content_object.get_comments_manager()
+            sender=Comment, instance=instance, user=instance.content_object.get_comments_manager() or instance.user
         )

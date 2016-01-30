@@ -1,10 +1,13 @@
 import time
 
-from django.conf import settings
 from django import forms
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.utils.crypto import salted_hmac, constant_time_compare
+from django.utils.encoding import force_str
 from django.forms.util import ErrorList, ErrorDict
 from django.utils.translation import ugettext_lazy as _, ungettext, ugettext
 from django.utils.text import get_text_list
@@ -14,22 +17,31 @@ from models import Comment
 class ShareForm(forms.Form):
     content_type = forms.ModelChoiceField(ContentType.objects.all(), widget=forms.HiddenInput())
     object_pk = forms.IntegerField(widget=forms.HiddenInput())
-    addressee = forms.CharField(max_length=5000)
+    user = forms.ModelChoiceField(User.objects.all(), widget=forms.HiddenInput())
+    addressee = forms.CharField(max_length=5000, required=False)
     comment = forms.CharField(max_length=500, widget=forms.Textarea(attrs={'rows': 4}), required=False)
 
-    def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
-                 label_suffix=None, empty_permitted=False):
-        super(ShareForm, self).__init__(data, files, auto_id, prefix, initial, error_class, label_suffix,
-                                        empty_permitted)
-        content_type = initial.get('content_type', None)
-        object_pk = initial.get('object_pk', None)
-        if content_type and object_pk:
-            self.object = content_type.get_object_for_this_type(pk=object_pk)
-
     def clean_addressee(self):
-        addressee = self.cleaned_data['addressee']
-        self.addressee_list = addressee.split(',')
+        addressee = self.cleaned_data.get('addressee', "")
+        self.addressee_list = addressee.split(',') if addressee != "" else []
         return addressee
+
+    def clean(self):
+        cleaned_data = super(ShareForm, self).clean()
+        self.content_object = cleaned_data['content_type'].get_object_for_this_type(pk=cleaned_data['object_pk'])
+        return cleaned_data
+
+    def share(self):
+        from signals import item_shared
+
+        if self.addressee_list:
+            item_shared.send(
+                self.content_object.__class__,
+                instance=self.content_object,
+                user=self.cleaned_data['user'],
+                addressee_list=self.addressee_list,
+                comment=self.cleaned_data['comment']
+            )
 
 
 class RateForm(forms.Form):
@@ -200,3 +212,113 @@ class CommentForm(forms.ModelForm):
         if not value and not self.cleaned_data['user']:
             raise forms.ValidationError(_(u"This field is required."))
         return value
+
+
+try:
+    from social_publisher.models import SocialNetwork
+    from social_publisher.provider import ActionMessageProvider, MessageProvider
+    from social_publisher.utils import social_networks_by_user, CONTENT_CLASS
+    from tasks import social_networks_publish_action_message, social_networks_publish_message
+
+
+    class ShareSocialNetworkForm(forms.Form):
+        content_type = forms.ModelChoiceField(ContentType.objects.all(), widget=forms.HiddenInput(), required=False)
+        object_pk = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+        user = forms.ModelChoiceField(User.objects.all(), widget=forms.HiddenInput())
+        social_networks = forms.MultipleChoiceField(
+            choices=[],
+            required=False,
+            label=_(u'Social Networks'),
+            help_text=_(u"Select Social Networks")
+        )
+        comment = forms.CharField(
+            max_length=500, widget=forms.Textarea(attrs={'rows': 2}), required=False,
+            help_text=_(u"Type a comment for your publication.")
+        )
+        action = forms.CharField(max_length=50, required=False, widget=forms.HiddenInput())
+        verb = forms.CharField(max_length=50, required=False, widget=forms.HiddenInput())
+        provider_type = forms.CharField(max_length=50, widget=forms.HiddenInput())
+
+        def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None, initial=None, error_class=ErrorList,
+                     label_suffix=None, empty_permitted=False):
+            super(ShareSocialNetworkForm, self).__init__(data, files, auto_id, prefix, initial, error_class,
+                                                               label_suffix, empty_permitted)
+            if initial:
+                if 'social_networks' in initial and initial['social_networks'] and isinstance(
+                        initial['social_networks'], (list, set, tuple)
+                ):
+                    self.initial['social_networks'] = [sn.pk for sn in initial['social_networks']]
+
+                if 'user' not in initial or not initial['user']:
+                    raise ImproperlyConfigured("The user must be defined in the initial content.")
+
+                if not isinstance(initial['user'], User):
+                    raise ImproperlyConfigured("The user must be an instance of django User.")
+
+                if 'provider_type' not in initial or not initial['provider_type']:
+                    raise ImproperlyConfigured("The provider_type must be defined in the initial content.")
+
+                self.fields['social_networks'].choices = self.fields['social_networks'].choices + [
+                    (sn.pk, sn.name) for sn in social_networks_by_user(initial['user'], initial['provider_type'])
+                ]
+
+            if data:
+                user_key = self.prefix + '-user' if self.prefix else 'user'
+                provider_type_key = self.prefix + '-provider_type' if self.prefix else 'provider_type'
+                if data[user_key] and data[provider_type_key]:
+                    self.fields['social_networks'].choices = self.fields['social_networks'].choices + [
+                        (sn.pk, sn.name) for sn in social_networks_by_user(
+                            User.objects.get(pk=data[user_key]),
+                            force_str(data[provider_type_key])
+                        )
+                    ]
+
+        def clean(self):
+            cleaned_data = super(ShareSocialNetworkForm, self).clean()
+            if ('comment' in cleaned_data and (not cleaned_data['comment'] or cleaned_data['comment'] == "")) and cleaned_data['social_networks']:
+                self._errors['social_networks'] = self.error_class(
+                    [_(u"You must type a comment to post in (%s).") % ' ,'.join([sn.name for sn in SocialNetwork.objects.filter(pk__in=cleaned_data['social_networks'])])]
+                )
+
+            if cleaned_data['provider_type'] and CONTENT_CLASS[cleaned_data['provider_type']] == ActionMessageProvider:
+                if not cleaned_data['action'] or cleaned_data['action'] == "":
+                    self._errors['action'] = self.error_class([_(u"This field is required.")])
+                if not cleaned_data['verb'] or cleaned_data['verb'] == "":
+                    self._errors['verb'] = self.error_class([_(u"This field is required.")])
+
+            if cleaned_data['content_type'] and cleaned_data['object_pk']:
+                self.content_object = cleaned_data['content_type'].get_object_for_this_type(pk=cleaned_data['object_pk'])
+
+            return cleaned_data
+
+        def share(self, content_object=None):
+            comment = self.cleaned_data.get('comment', None)
+            social_networks = self.cleaned_data.get('social_networks', None)
+            content_object = content_object or self.content_object
+            if comment and comment != "" and social_networks and social_networks and content_object:
+                site_pk = Site.objects.get_current().pk
+                content_type = self.cleaned_data['content_type'] or ContentType.objects.get_for_model(content_object)
+
+                if (CONTENT_CLASS[self.cleaned_data['provider_type']] == ActionMessageProvider):
+                    social_networks_publish_action_message.delay(
+                        message=comment,
+                        content_type_pk=content_type.pk,
+                        object_pk=content_object.pk,
+                        user_pk=self.cleaned_data['user'].pk,
+                        site_pk=site_pk,
+                        social_network_ids=social_networks,
+                        action=self.cleaned_data['action'],
+                        verb=self.cleaned_data['verb']
+                    )
+                elif (CONTENT_CLASS[self.cleaned_data['provider_type']] == MessageProvider):
+                    social_networks_publish_message.delay(
+                        message=comment,
+                        content_type_pk=content_type.pk,
+                        object_pk=content_object.pk,
+                        user_pk=self.cleaned_data['user'].pk,
+                        site_pk=site_pk,
+                        social_network_ids=social_networks,
+                    )
+
+except ImportError:
+    pass

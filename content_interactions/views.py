@@ -12,7 +12,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View, FormView, CreateView, UpdateView, DeleteView, ListView
 from django.contrib.sites.models import Site
 from forms import ShareForm, RateForm, DenounceForm, CommentForm
-from signals import item_shared
 from utils import intmin
 from models import Comment
 
@@ -130,20 +129,15 @@ class ShareView(FormView):
         content_type_pk = self.request.REQUEST.get('content_type', None)
         return {
             'content_type': ContentType.objects.get(pk=content_type_pk) if content_type_pk else None,
-            'object_pk': self.request.REQUEST.get('object_pk', None)
+            'object_pk': self.request.REQUEST.get('object_pk', None),
+            'user': self.request.user
         }
 
     def form_valid(self, form):
         """
         If the form is valid, share item.
         """
-
-        if form.object:
-            item_shared.send(form.object.__class__,
-                             instance=form.object,
-                             user=self.request.user,
-                             addressee_list=form.addressee_list,
-                             comment=form.cleaned_data['comment'])
+        form.share()
         context = {
             'successMsg': force_text(MODAL_SHARE_SUCCESS_MESSAGE),
         }
@@ -300,7 +294,7 @@ class CommentUpdateView(CommentViewMixin,UpdateView):
 
     def get_object(self, queryset=None):
         obj = super(CommentUpdateView, self).get_object(queryset)
-        if self.request.user != obj.user:
+        if self.request.user.pk != obj.user.pk:
             raise ImproperlyConfigured(_(u"The comment must be edited by the user creator."))
         return obj
 
@@ -336,8 +330,11 @@ class CommentDeleteView(DeleteView):
     model = Comment
 
     def get_object(self, queryset=None):
+        from django.contrib.auth.models import User
+
         obj = super(CommentDeleteView, self).get_object(queryset)
-        if self.request.user != obj.content_object.get_comments_manager() and self.request.user != obj.user:
+        comment_manager = obj.content_object.get_comments_manager()
+        if (isinstance(comment_manager, User) and comment_manager.pk !=  self.request.user.pk) and self.request.user.pk != obj.user.pk:
             raise ImproperlyConfigured(
                 _(u"The comment must be deleted by the user creator or user content_type manager.")
             )

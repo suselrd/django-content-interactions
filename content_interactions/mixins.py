@@ -313,6 +313,17 @@ class CommentTargetMixin(ContentInteractionMixin):
             return None
 
 
+class ShareToSocialNetworkTargetMixin(ContentInteractionMixin):
+
+    def get_picture(self):
+        picture = getattr(self, 'picture', None)
+        return picture() if callable(picture) else picture
+
+    def get_url(self):
+        url = getattr(self, 'url', "")
+        return url() if callable(url) else url
+
+
 class LikableManagerMixin(object):
     graph = graph
 

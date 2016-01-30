@@ -95,10 +95,11 @@ def can_edit_comment(comment, user):
     if not comment.user:
         return False
 
-    if not user or user.is_anonymous():
+    from django.contrib.auth.models import User
+    if not user or not isinstance(user, User) or user.is_anonymous():
         return False
 
-    return comment.user == user
+    return comment.user.pk == user.pk
 
 
 @register.assignment_tag
@@ -106,10 +107,12 @@ def can_delete_comment(comment, user):
     if not isinstance(comment, Comment):
         raise Exception("Comment instance expected")
 
-    if not user or user.is_anonymous():
+    from django.contrib.auth.models import User
+    if not user or not isinstance(user, User) or user.is_anonymous():
         return False
 
-    return comment.content_object.get_comments_manager() == user or comment.user == user
+    comment_manager = comment.content_object.get_comments_manager()
+    return (isinstance(comment_manager, User) and comment_manager.pk == user.pk) or comment.user.pk == user.pk
 
 
 @register.assignment_tag
