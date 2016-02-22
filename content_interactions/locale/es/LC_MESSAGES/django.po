@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-content-interactions\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-25 11:07-0600\n"
+"POT-Creation-Date: 2016-02-22 08:43-0600\n"
 "PO-Revision-Date: 2014-11-27 00:23-0500\n"
 "Last-Translator: Susel Ruiz <suselrd@gmail.com>\n"
 "Language-Team: Spanish\n"
@@ -17,33 +17,50 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms.py:93
+#: forms.py:105
 msgid ""
 "If you enter anything in this field your comment will be treated as spam"
 msgstr ""
 
-#: forms.py:158
+#: forms.py:170
 #, python-format
 msgid "Watch your mouth! The word %s is not allowed here."
 msgid_plural "Watch your mouth! The words %s are not allowed here."
 msgstr[0] ""
 msgstr[1] ""
 
-#: forms.py:162
+#: forms.py:174
 msgid "and"
 msgstr "y"
 
-#: forms.py:175
+#: forms.py:187
 msgid "Security hash check failed."
 msgstr "El chequeo de seguridad ha fallado."
 
-#: forms.py:182
+#: forms.py:194
 msgid "Timestamp check failed"
 msgstr "El chequeo de marca de tiempo ha fallado."
 
-#: forms.py:195 forms.py:201
+#: forms.py:207 forms.py:213 forms.py:285 forms.py:287
 msgid "This field is required."
 msgstr "Este campo es obligatorio."
+
+#: forms.py:231
+msgid "Social Networks"
+msgstr "Redes Sociales"
+
+#: forms.py:232
+msgid "Select Social Networks"
+msgstr "Selecciona Redes Sociales"
+
+#: forms.py:236
+msgid "Type a comment for your publication."
+msgstr "Escribe un comentario para tu publicación."
+
+#: forms.py:280
+#, python-format
+msgid "You must type a comment to post in (%s)."
+msgstr "Usted debe escribir un comentario para publicar en (%s)."
 
 #: models.py:35
 msgid "content type"
@@ -112,8 +129,8 @@ msgid ""
 "Check this box if the comment is inappropriate. A \"This comment has been "
 "removed\" message will be displayed instead."
 msgstr ""
-"Marque esta casilla si el comentario es inapropiado. Un mensaje de \"El comentario ha sido "
-"eliminado\" se mostrará en su lugar."
+"Marque esta casilla si el comentario es inapropiado. Un mensaje de \"El "
+"comentario ha sido eliminado\" se mostrará en su lugar."
 
 #: models.py:106
 msgid "comments"
@@ -124,16 +141,16 @@ msgid ""
 "This comment was posted by an authenticated user and thus the name is read-"
 "only."
 msgstr ""
-"Este comentario fue publicado por un usuario autenticado, por lo que el nombre no "
-"puede modificarse."
+"Este comentario fue publicado por un usuario autenticado, por lo que el "
+"nombre no puede modificarse."
 
 #: models.py:156
 msgid ""
 "This comment was posted by an authenticated user and thus the email is read-"
 "only."
 msgstr ""
-"Este comentario fue publicado por un usuario autenticado, por lo que el correo electrónico no "
-"puede modificarse."
+"Este comentario fue publicado por un usuario autenticado, por lo que el "
+"correo electrónico no puede modificarse."
 
 #: models.py:184
 #, python-format
@@ -165,67 +182,68 @@ msgstr ""
 msgid "%(value)dG"
 msgstr ""
 
-#: views.py:21
+#: views.py:20
 msgid "A validation error has occurred."
 msgstr "Ha ocurrido un error de validación"
 
-#: views.py:22
+#: views.py:21
 msgid "The item has been successfully shared."
 msgstr "El elemento ha sido compartido satisfactoriamente."
 
-#: views.py:23
+#: views.py:22
 msgid "The item has been successfully recommended."
 msgstr "El elemento ha sido recomendado satisfactoriamente."
 
-#: views.py:24
+#: views.py:23
 msgid "The item has been successfully rated."
 msgstr "El elemento ha sido calificado satisfactoriamente."
 
-#: views.py:25
+#: views.py:24
 msgid "The item has been successfully denounced."
 msgstr "El elemento ha sido denunciado satisfactoriamente."
 
-#: views.py:26
+#: views.py:25
 msgid "The denounce has been successfully deleted."
 msgstr "La denuncia ha sido eliminada satisfactoriamente."
 
-#: views.py:27
+#: views.py:26
 msgid "The comment has been successfully deleted."
 msgstr "El comentatio ha sido eliminado satisfactoriamente."
 
-#: views.py:65
+#: views.py:64
 msgid "Like"
 msgstr "Me Gusta"
 
-#: views.py:69
+#: views.py:68
 msgid "Unlike"
 msgstr "No me Gusta"
 
-#: views.py:103
+#: views.py:102
 msgid "Mark as Favorite"
 msgstr "Marcar como Favorito"
 
-#: views.py:107
+#: views.py:106
 msgid "Not my Favorite"
 msgstr "Desmarcar como Favorito"
 
-#: views.py:222
+#: views.py:216
 msgid "Delete Denounce"
 msgstr "Eliminar Denuncia"
 
-#: views.py:222
+#: views.py:216
 msgid "Denounce"
 msgstr "Denunciar"
 
-#: views.py:304
+#: views.py:298
 msgid "The comment must be edited by the user creator."
 msgstr "El comentario solo puede ser modificado por su autor."
 
-#: views.py:342
+#: views.py:339
 msgid ""
 "The comment must be deleted by the user creator or user content_type manager."
 msgstr ""
-"El comentario solo puede ser eliminado por su autor o por el administrador del contenido asociado."
+"El comentario solo puede ser eliminado por su autor o por el administrador "
+"del contenido asociado."
 
 #: templates/content_interactions/comment_answer.html:23
 #: templates/content_interactions/comment_create.html:22
@@ -248,7 +266,8 @@ msgstr "Responder"
 #: templates/content_interactions/comment_list.html:5
 #, python-format
 msgid "<span id=\"comment_count\">%(count)s</span> comments have been posted."
-msgstr "<span id=\"comment_count\">%(count)s</span> comentarios han sido publicados."
+msgstr ""
+"<span id=\"comment_count\">%(count)s</span> comentarios han sido publicados."
 
 #: templates/content_interactions/comment_list.html:6
 msgid "Be the first to post a comment."
