@@ -334,7 +334,7 @@ class CommentDeleteView(DeleteView):
 
         obj = super(CommentDeleteView, self).get_object(queryset)
         comment_manager = obj.content_object.get_comments_manager()
-        if (isinstance(comment_manager, User) and comment_manager.pk !=  self.request.user.pk) and self.request.user.pk != obj.user.pk:
+        if (isinstance(comment_manager, User) and comment_manager.pk != self.request.user.pk) and self.request.user.pk != obj.user.pk:
             raise ImproperlyConfigured(
                 _(u"The comment must be deleted by the user creator or user content_type manager.")
             )

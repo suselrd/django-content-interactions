@@ -112,7 +112,7 @@ def can_delete_comment(comment, user):
         return False
 
     comment_manager = comment.content_object.get_comments_manager()
-    return (isinstance(comment_manager, User) and comment_manager.pk == user.pk) or comment.user.pk == user.pk
+    return (isinstance(comment_manager, User) and comment_manager.pk == user.pk) or (comment.user is not None and comment.user.pk == user.pk)
 
 
 @register.assignment_tag
