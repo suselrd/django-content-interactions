@@ -179,6 +179,12 @@ class LikableMixin(ContentInteractionMixin):
     def likes(self):
         return graph.edge_count(self, liked_by_edge(), self.get_site())
 
+    @property
+    def liking_users(self):
+        return [node for node, attributes, time in graph.edge_range(
+            self, liked_by_edge(), 0, self.likes, self.get_site()
+        )]
+
     def liked_by(self, user):
         return graph.edge_get(self, liked_by_edge(), user, self.get_site()) is not None
 
@@ -199,6 +205,12 @@ class FavoriteListItemMixin(ContentInteractionMixin):
     @property
     def favorite_marks(self):
         return graph.edge_count(self, favorite_of_edge(), self.get_site())
+
+    @property
+    def favorite_marking_users(self):
+        return [node for node, attributes, time in graph.edge_range(
+            self, favorite_of_edge(), 0, self.favorite_marks, self.get_site()
+        )]
 
     def favorite_of(self, user):
         return graph.edge_get(self, favorite_of_edge(), user, self.get_site()) is not None
@@ -221,6 +233,12 @@ class RateableMixin(ContentInteractionMixin):
     @property
     def ratings(self):
         return graph.edge_count(self, rated_by_edge(), self.get_site())
+
+    @property
+    def rating_users(self):
+        return [node for node, attributes, time in graph.edge_range(
+            self, rated_by_edge(), 0, self.ratings, self.get_site()
+        )]
 
     @property
     def avg_rating(self):
@@ -275,6 +293,12 @@ class DenounceTargetMixin(ContentInteractionMixin):
     @property
     def denounces(self):
         return graph.edge_count(self, denounced_by_edge(), self.get_site())
+
+    @property
+    def denouncing_users(self):
+        return [node for node, attributes, time in graph.edge_range(
+            self, denounced_by_edge(), 0, self.denounces, self.get_site()
+        )]
 
     def denounced_by(self, user):
         return graph.edge_get(self, denounced_by_edge(), user, self.get_site()) is not None
