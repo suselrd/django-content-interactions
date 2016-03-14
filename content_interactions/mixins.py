@@ -336,6 +336,27 @@ class CommentTargetMixin(ContentInteractionMixin):
         else:
             return None
 
+    @property
+    def comment_list(self):
+        from .models import Comment
+        return Comment.objects.for_model(self)
+
+    @property
+    def comments(self):
+        return self.comment_list.count()
+
+    @property
+    def commenting_users(self):
+        return set([comment.user for comment in self.comment_list if comment.user])
+
+    @property
+    def commenting_user_pks(self):
+        return set([comment.user.pk for comment in self.comment_list if comment.user])
+
+    def commented_by(self, user):
+        from django.contrib.auth.models import User
+        return isinstance(user, User) and (user.pk in self.commenting_user_pks)
+
 
 class ShareToSocialNetworkTargetMixin(ContentInteractionMixin):
 
