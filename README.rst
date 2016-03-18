@@ -8,6 +8,14 @@ Like, Mark as Favorite, Rate, Share, Denounce...
 
 Changelog
 =========
+0.7.2
+-----
++ Removed unused method 'get_absolute_url' from 'Comment' model class
+
+0.7.1
+-----
++ Added functionality to comment target mixin.
+
 0.7.0
 -----
 + Added functionality to mixins

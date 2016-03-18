@@ -43,15 +43,6 @@ class BaseCommentAbstractModel(models.Model):
     class Meta:
         abstract = True
 
-    def get_content_object_url(self):
-        """
-        Get a URL suitable for redirecting to the content object.
-        """
-        return urlresolvers.reverse(
-            "comments-url-redirect",
-            args=(self.content_type_id, self.object_pk)
-        )
-
 
 def validate_level(value):
     if value > settings.COMMENT_MAX_LEVELS:
@@ -166,9 +157,6 @@ class Comment(BaseCommentAbstractModel):
         self.user_url = val
 
     url = property(_get_url, _set_url, doc="The URL given by the user who posted this comment")
-
-    def get_absolute_url(self, anchor_pattern="#c%(id)s"):
-        return self.get_content_object_url() + (anchor_pattern % self.__dict__)
 
     def get_as_text(self):
         """
