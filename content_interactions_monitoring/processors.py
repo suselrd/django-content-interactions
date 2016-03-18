@@ -1,5 +1,5 @@
 # coding=utf-8
-from social_graph import object_visited
+from social_graph.signals import object_visited
 from handlers import (
     visit_handler
 )

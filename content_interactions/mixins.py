@@ -3,7 +3,7 @@ import logging
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.contrib.sites.models import Site
-from social_graph import Graph, EdgeType, ATTRIBUTES
+from social_graph import Graph
 from . import (
     LIKE, LIKED_BY, RATE, RATED_BY, FAVORITE, FAVORITE_OF, DENOUNCE, DENOUNCED_BY,
     AUTHOR, AUTHORED_BY, TARGET, TARGETED_BY
@@ -28,6 +28,7 @@ def like_edge():
     like = cache.get('LIKE_EDGE_TYPE')
     if like is not None:
         return like
+    from social_graph.models import EdgeType
     try:
         like = EdgeType.objects.get(name=LIKE)
         cache.set('LIKE_EDGE_TYPE', like)
@@ -40,6 +41,7 @@ def liked_by_edge():
     liked_by = cache.get('LIKED_BY_EDGE_TYPE')
     if liked_by is not None:
         return liked_by
+    from social_graph.models import EdgeType
     try:
         liked_by = EdgeType.objects.get(name=LIKED_BY)
         cache.set('LIKED_BY_EDGE_TYPE', liked_by)
@@ -52,6 +54,7 @@ def rate_edge():
     rate = cache.get('RATE_EDGE_TYPE')
     if rate is not None:
         return rate
+    from social_graph.models import EdgeType
     try:
         rate = EdgeType.objects.get(name=RATE)
         cache.set('RATE_EDGE_TYPE', rate)
@@ -64,6 +67,7 @@ def rated_by_edge():
     rated_by = cache.get('RATED_BY_EDGE_TYPE')
     if rated_by is not None:
         return rated_by
+    from social_graph.models import EdgeType
     try:
         rated_by = EdgeType.objects.get(name=RATED_BY)
         cache.set('RATED_BY_EDGE_TYPE', rated_by)
@@ -76,6 +80,7 @@ def favorite_edge():
     favorite = cache.get('FAVORITE_EDGE_TYPE')
     if favorite is not None:
         return favorite
+    from social_graph.models import EdgeType
     try:
         favorite = EdgeType.objects.get(name=FAVORITE)
         cache.set('FAVORITE_EDGE_TYPE', favorite)
@@ -88,6 +93,7 @@ def favorite_of_edge():
     favorite_of = cache.get('FAVORITE_OF_EDGE_TYPE')
     if favorite_of is not None:
         return favorite_of
+    from social_graph.models import EdgeType
     try:
         favorite_of = EdgeType.objects.get(name=FAVORITE_OF)
         cache.set('FAVORITE_OF_EDGE_TYPE', favorite_of)
@@ -100,6 +106,7 @@ def denounce_edge():
     denounce = cache.get('DENOUNCE_EDGE_TYPE')
     if denounce is not None:
         return denounce
+    from social_graph.models import EdgeType
     try:
         denounce = EdgeType.objects.get(name=DENOUNCE)
         cache.set('DENOUNCE_EDGE_TYPE', denounce)
@@ -112,6 +119,7 @@ def denounced_by_edge():
     denounced_by = cache.get('DENOUNCED_BY_EDGE_TYPE')
     if denounced_by is not None:
         return denounced_by
+    from social_graph.models import EdgeType
     try:
         denounced_by = EdgeType.objects.get(name=DENOUNCED_BY)
         cache.set('DENOUNCED_BY_EDGE_TYPE', denounced_by)
@@ -124,6 +132,7 @@ def author_edge():
     author = cache.get('AUTHOR_EDGE_TYPE')
     if author is not None:
         return author
+    from social_graph.models import EdgeType
     try:
         author = EdgeType.objects.get(name=AUTHOR)
         cache.set('AUTHOR_EDGE_TYPE', author)
@@ -136,6 +145,7 @@ def authored_by_edge():
     authored_by = cache.get('AUTHORED_BY_EDGE_TYPE')
     if authored_by is not None:
         return authored_by
+    from social_graph.models import EdgeType
     try:
         authored_by = EdgeType.objects.get(name=AUTHORED_BY)
         cache.set('AUTHORED_BY_EDGE_TYPE', authored_by)
@@ -148,6 +158,7 @@ def target_edge():
     target = cache.get('TARGET_EDGE_TYPE')
     if target is not None:
         return target
+    from social_graph.models import EdgeType
     try:
         target = EdgeType.objects.get(name=TARGET)
         cache.set('TARGET_EDGE_TYPE', target)
@@ -160,6 +171,7 @@ def targeted_by_edge():
     targeted_by = cache.get('TARGETED_BY_EDGE_TYPE')
     if targeted_by is not None:
         return targeted_by
+    from social_graph.models import EdgeType
     try:
         targeted_by = EdgeType.objects.get(name=TARGETED_BY)
         cache.set('TARGETED_BY_EDGE_TYPE', targeted_by)
@@ -251,8 +263,9 @@ class RateableMixin(ContentInteractionMixin):
         )/(self.ratings * float(1)) if self.ratings else 0
 
     def rating_of(self, rating_value):
+        from social_graph import ATTRIBUTES_INDEX
         _edges = graph.edge_range(self, rated_by_edge(), 0, self.ratings, self.get_site())
-        return len([_edge for _edge in _edges if _edge[ATTRIBUTES]['rating'] == rating_value])
+        return len([_edge for _edge in _edges if _edge[ATTRIBUTES_INDEX]['rating'] == rating_value])
 
     def rating(self, user):
         _edge = graph.edge_get(self, rated_by_edge(), user, self.get_site())

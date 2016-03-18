@@ -1,37 +1,36 @@
 # coding=utf-8
 from django.db.models.signals import post_syncdb
-from social_graph import EdgeType, EdgeTypeAssociation
-from . import (
-    LIKE,
-    LIKE_STR,
-    LIKED_BY,
-    LIKED_BY_STR,
-    RATE,
-    RATE_STR,
-    RATED_BY,
-    RATED_BY_STR,
-    FAVORITE,
-    FAVORITE_STR,
-    FAVORITE_OF,
-    FAVORITE_OF_STR,
-    DENOUNCE,
-    DENOUNCE_STR,
-    DENOUNCED_BY,
-    DENOUNCED_BY_STR,
-    AUTHOR,
-    AUTHOR_STR,
-    AUTHORED_BY,
-    AUTHORED_BY_STR,
-    TARGET,
-    TARGET_STR,
-    TARGETED_BY,
-    TARGETED_BY_STR,
-)
-
 import models as content_interactions_app
 
 
 def create_edge_types(**kwargs):
+    from social_graph.models import EdgeType, EdgeTypeAssociation
+    from . import (
+        LIKE,
+        LIKE_STR,
+        LIKED_BY,
+        LIKED_BY_STR,
+        RATE,
+        RATE_STR,
+        RATED_BY,
+        RATED_BY_STR,
+        FAVORITE,
+        FAVORITE_STR,
+        FAVORITE_OF,
+        FAVORITE_OF_STR,
+        DENOUNCE,
+        DENOUNCE_STR,
+        DENOUNCED_BY,
+        DENOUNCED_BY_STR,
+        AUTHOR,
+        AUTHOR_STR,
+        AUTHORED_BY,
+        AUTHORED_BY_STR,
+        TARGET,
+        TARGET_STR,
+        TARGETED_BY,
+        TARGETED_BY_STR,
+    )
     # Like edges
     like, created = EdgeType.objects.get_or_create(name=LIKE, defaults={
         'read_as': LIKE_STR
